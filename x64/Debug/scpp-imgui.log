@@ -1,2 +1,3 @@
-﻿  Login.cpp
+﻿  ApiHelper.cpp
+C:\Users\Chemy\Documents\GitHub\SCPP-ImGui\src\helpers\ApiHelper.cpp(9,22): warning C4267: 'return': conversión de 'size_t' a 'int'; posible pérdida de datos
   scpp-imgui.vcxproj -> C:\Users\Chemy\Documents\GitHub\SCPP-ImGui\x64\Debug\scpp-imgui.exe

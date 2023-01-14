@@ -1,0 +1,14 @@
+﻿  App.cpp
+  AppState.cpp
+  imgui.cpp
+  imgui_demo.cpp
+  imgui_draw.cpp
+  imgui_impl_dx12.cpp
+C:\Users\Chemy\Documents\GitHub\SCPP-ImGui\include\imgui\imgui_impl_dx12.cpp(514,39): error C2338: static_assert failed: 'Can't pack descriptor handle into TexID, 32-bit not supported yet.'
+  imgui_impl_win32.cpp
+  imgui_stdlib.cpp
+  imgui_tables.cpp
+  imgui_widgets.cpp
+  Router.cpp
+  Login.cpp
+  Generando código...

@@ -70,16 +70,23 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Users\Chemy\Documents\GitHub\SCPP-ImGui\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\Chemy\Documents\GitHub\SCPP-ImGui\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\Chemy\Documents\GitHub\SCPP-ImGui\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -104,11 +111,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(SolutionDir)\lib\libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -139,10 +148,24 @@
     <ClCompile Include="include\imgui\imgui_tables.cpp" />
     <ClCompile Include="include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Router.cpp" />
+    <ClCompile Include="src\helpers\ApiHelper.cpp" />
+    <ClCompile Include="src\jsoncpp\jsoncpp.cpp" />
     <ClCompile Include="src\login\Login.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppState.h" />
+    <ClInclude Include="include\curl\curl.h" />
+    <ClInclude Include="include\curl\curlver.h" />
+    <ClInclude Include="include\curl\easy.h" />
+    <ClInclude Include="include\curl\header.h" />
+    <ClInclude Include="include\curl\mprintf.h" />
+    <ClInclude Include="include\curl\multi.h" />
+    <ClInclude Include="include\curl\options.h" />
+    <ClInclude Include="include\curl\stdcheaders.h" />
+    <ClInclude Include="include\curl\system.h" />
+    <ClInclude Include="include\curl\typecheck-gcc.h" />
+    <ClInclude Include="include\curl\urlapi.h" />
+    <ClInclude Include="include\curl\websockets.h" />
     <ClInclude Include="include\imgui\imconfig.h" />
     <ClInclude Include="include\imgui\imgui.h" />
     <ClInclude Include="include\imgui\imgui_impl_dx12.h" />
@@ -152,6 +175,17 @@
     <ClInclude Include="include\imgui\imstb_rectpack.h" />
     <ClInclude Include="include\imgui\imstb_textedit.h" />
     <ClInclude Include="include\imgui\imstb_truetype.h" />
+    <ClInclude Include="include\json\allocator.h" />
+    <ClInclude Include="include\json\assertions.h" />
+    <ClInclude Include="include\json\config.h" />
+    <ClInclude Include="include\json\forwards.h" />
+    <ClInclude Include="include\json\json-forwards.h" />
+    <ClInclude Include="include\json\json.h" />
+    <ClInclude Include="include\json\json_features.h" />
+    <ClInclude Include="include\json\reader.h" />
+    <ClInclude Include="include\json\value.h" />
+    <ClInclude Include="include\json\version.h" />
+    <ClInclude Include="include\json\writer.h" />
     <ClInclude Include="Router.h" />
     <ClInclude Include="src\login\Login.h" />
   </ItemGroup>

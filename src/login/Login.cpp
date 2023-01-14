@@ -2,10 +2,12 @@
 #include <imgui/imgui_impl_win32.h>
 #include <imgui/imgui_impl_dx12.h>
 #include <imgui/imgui_stdlib.h>
+#include <curl/curl.h>
 
 #include <stdio.h>
 #include <string>
 #include "../AppState.h"
+#include "../src/helpers/ApiHelper.h"
 
 namespace Login {
 	void login_render() {
@@ -32,10 +34,13 @@ namespace Login {
 			
 			// Llamar a la API y verificar que la clave corresponde
 			if (strcmp(username, "admin") == 0 && strcmp(pass, "admin") == 0)  {
+				ApiHelper::fn();
 				AppState::route = "/";
+
 			}
 		}
 
 		ImGui::End();
 	}
+
 }

@@ -19,6 +19,12 @@
     <Filter Include="Archivos de origen\imgui">
       <UniqueIdentifier>{412102d6-891e-40e2-934a-8f437f6a598f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de encabezado\curl">
+      <UniqueIdentifier>{76a7d5ef-ed26-4a98-b760-a262444a2beb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\jsoncpp">
+      <UniqueIdentifier>{9e870a51-2c40-4940-b17a-b38cd8ffc55f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -55,6 +61,12 @@
       <Filter>Archivos de origen\imgui</Filter>
     </ClCompile>
     <ClCompile Include="AppState.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\helpers\ApiHelper.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\jsoncpp\jsoncpp.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
   </ItemGroup>
@@ -94,6 +106,75 @@
     </ClInclude>
     <ClInclude Include="include\imgui\imgui_stdlib.h">
       <Filter>Archivos de encabezado\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\easy.h">
+      <Filter>Archivos de encabezado\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\header.h">
+      <Filter>Archivos de encabezado\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\mprintf.h">
+      <Filter>Archivos de encabezado\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\multi.h">
+      <Filter>Archivos de encabezado\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\options.h">
+      <Filter>Archivos de encabezado\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\stdcheaders.h">
+      <Filter>Archivos de encabezado\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\system.h">
+      <Filter>Archivos de encabezado\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\typecheck-gcc.h">
+      <Filter>Archivos de encabezado\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\urlapi.h">
+      <Filter>Archivos de encabezado\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\websockets.h">
+      <Filter>Archivos de encabezado\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\curl.h">
+      <Filter>Archivos de encabezado\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curl\curlver.h">
+      <Filter>Archivos de encabezado\curl</Filter>
+    </ClInclude>
+    <ClInclude Include="include\json\config.h">
+      <Filter>Archivos de encabezado\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\json\forwards.h">
+      <Filter>Archivos de encabezado\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\json\json.h">
+      <Filter>Archivos de encabezado\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\json\json_features.h">
+      <Filter>Archivos de encabezado\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\json\json-forwards.h">
+      <Filter>Archivos de encabezado\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\json\reader.h">
+      <Filter>Archivos de encabezado\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\json\value.h">
+      <Filter>Archivos de encabezado\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\json\version.h">
+      <Filter>Archivos de encabezado\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\json\writer.h">
+      <Filter>Archivos de encabezado\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\json\allocator.h">
+      <Filter>Archivos de encabezado\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\json\assertions.h">
+      <Filter>Archivos de encabezado\jsoncpp</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
