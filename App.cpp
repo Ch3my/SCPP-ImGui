@@ -162,6 +162,9 @@ int main(int, char**)
         ImGui::NewFrame();
 
         ImGui::ShowDemoWindow();
+        // TODO. Cargar datos guardados en archivo json en la raiz
+        // a ApiState lo que corresponda
+
         // Llamamos al router, que se encarga de renderizar lo que cooresponda
         Router::router();
 

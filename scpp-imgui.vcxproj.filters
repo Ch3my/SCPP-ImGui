@@ -25,6 +25,18 @@
     <Filter Include="Archivos de encabezado\jsoncpp">
       <UniqueIdentifier>{9e870a51-2c40-4940-b17a-b38cd8ffc55f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de encabezado\documentos">
+      <UniqueIdentifier>{8406115a-5094-486d-9ee1-193dbeaf82c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\documentos">
+      <UniqueIdentifier>{14551566-5784-4eca-aa35-3b468c8942d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\helpers">
+      <UniqueIdentifier>{d3e05501-10db-471b-983e-fe4bc1eb3136}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\helpers">
+      <UniqueIdentifier>{a8e33633-2ed9-4921-ba8b-a038796b10d2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -63,11 +75,17 @@
     <ClCompile Include="AppState.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="src\helpers\ApiHelper.cpp">
-      <Filter>Archivos de origen</Filter>
-    </ClCompile>
     <ClCompile Include="src\jsoncpp\jsoncpp.cpp">
       <Filter>Archivos de origen</Filter>
+    </ClCompile>
+    <ClCompile Include="src\documentos\documentos.cpp">
+      <Filter>Archivos de origen\documentos</Filter>
+    </ClCompile>
+    <ClCompile Include="src\helpers\ApiHelper.cpp">
+      <Filter>Archivos de origen\helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\helpers\FormatNumber.cpp">
+      <Filter>Archivos de origen\helpers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -175,6 +193,15 @@
     </ClInclude>
     <ClInclude Include="include\json\assertions.h">
       <Filter>Archivos de encabezado\jsoncpp</Filter>
+    </ClInclude>
+    <ClInclude Include="src\documentos\documentos.h">
+      <Filter>Archivos de encabezado\documentos</Filter>
+    </ClInclude>
+    <ClInclude Include="src\helpers\ApiHelper.h">
+      <Filter>Archivos de encabezado\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\helpers\FormatNumber.h">
+      <Filter>Archivos de encabezado\helpers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

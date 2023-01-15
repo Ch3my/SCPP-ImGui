@@ -148,7 +148,9 @@
     <ClCompile Include="include\imgui\imgui_tables.cpp" />
     <ClCompile Include="include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Router.cpp" />
+    <ClCompile Include="src\documentos\documentos.cpp" />
     <ClCompile Include="src\helpers\ApiHelper.cpp" />
+    <ClCompile Include="src\helpers\FormatNumber.cpp" />
     <ClCompile Include="src\jsoncpp\jsoncpp.cpp" />
     <ClCompile Include="src\login\Login.cpp" />
   </ItemGroup>
@@ -187,6 +189,9 @@
     <ClInclude Include="include\json\version.h" />
     <ClInclude Include="include\json\writer.h" />
     <ClInclude Include="Router.h" />
+    <ClInclude Include="src\documentos\documentos.h" />
+    <ClInclude Include="src\helpers\ApiHelper.h" />
+    <ClInclude Include="src\helpers\FormatNumber.h" />
     <ClInclude Include="src\login\Login.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

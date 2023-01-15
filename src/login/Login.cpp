@@ -31,12 +31,10 @@ namespace Login {
 		if (btn) {
 			// comparar char con "" no funcionaba, se utilizo strcmp seguramente
 			// es algo con el boxing o el largo del item
-			
-			// Llamar a la API y verificar que la clave corresponde
-			if (strcmp(username, "admin") == 0 && strcmp(pass, "admin") == 0)  {
-				ApiHelper::fn();
-				AppState::route = "/";
 
+			// Llamar a la API y verificar que la clave corresponde
+			if (strcmp(username, "admin") == 0 && strcmp(pass, "admin") == 0) {
+				AppState::route = "/documentos";
 			}
 		}
 

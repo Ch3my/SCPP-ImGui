@@ -5,12 +5,16 @@
 #include <imgui/imgui_impl_dx12.h>
 
 #include "src/login/Login.h"
+#include "src/documentos/documentos.h"
 
 namespace Router
 {
 	void router() {
 		if (AppState::route == "/login") {
 			Login::login_render();
+		}
+		else if (AppState::route == "/documentos") {
+			Documentos::render();
 		}
 		else {
 			ImGui::Begin("Default Window");
