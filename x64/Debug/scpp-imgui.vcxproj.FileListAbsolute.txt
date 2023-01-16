@@ -1,1 +1,1 @@
-C:\Users\Chemy\Documents\GitHub\SCPP-imgui\x64\Debug\scpp-imgui.exe
+C:\Users\Chemy\Documents\GitHub\SCPP-ImGui\x64\Debug\scpp-imgui.exe

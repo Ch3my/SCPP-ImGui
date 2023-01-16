@@ -1,2 +1,21 @@
-﻿  documentos.cpp
-  scpp-imgui.vcxproj -> C:\Users\Chemy\Documents\GitHub\SCPP-imgui\x64\Debug\scpp-imgui.exe
+﻿  App.cpp
+  AppState.cpp
+  imgui.cpp
+  imgui_demo.cpp
+  imgui_draw.cpp
+  imgui_impl_glfw.cpp
+  imgui_impl_vulkan.cpp
+  imgui_impl_win32.cpp
+  imgui_stdlib.cpp
+  imgui_tables.cpp
+  imgui_widgets.cpp
+  Router.cpp
+  documentos.cpp
+  ApiHelper.cpp
+C:\Users\Chemy\Documents\GitHub\SCPP-ImGui\src\helpers\ApiHelper.cpp(11,22): warning C4267: 'return': conversión de 'size_t' a 'int'; posible pérdida de datos
+  FormatNumber.cpp
+  jsoncpp.cpp
+  Login.cpp
+  Generando código...
+LINK : warning LNK4098: la biblioteca predeterminada'MSVCRT' entra en conflicto con otras bibliotecas; use la biblioteca /NODEFAULTLIB:biblioteca
+  scpp-imgui.vcxproj -> C:\Users\Chemy\Documents\GitHub\SCPP-ImGui\x64\Debug\scpp-imgui.exe
