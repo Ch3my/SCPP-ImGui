@@ -364,7 +364,8 @@ int main(int, char**)
         return 1;
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+Vulkan example", NULL, NULL);
+    // Crea ventana con tamaño y titulo personalizado
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "SCPP", NULL, NULL);
 
     // Setup Vulkan
     if (!glfwVulkanSupported())
@@ -439,7 +440,7 @@ int main(int, char**)
     //io.Fonts->AddFontDefault();
     //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-    io.Fonts->AddFontFromFileTTF("assets/Roboto-Medium.ttf", 16.0f);
+    io.Fonts->AddFontFromFileTTF("assets/Roboto-Medium.ttf", 18.0f);
     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
     //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
     //IM_ASSERT(font != NULL);
@@ -508,7 +509,11 @@ int main(int, char**)
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        // ==== DEBUG/DEV ====
+        ImGui::ShowMetricsWindow();
         ImGui::ShowDemoWindow();
+
+        // ==== APP ====
         // TODO. Cargar datos guardados en archivo json en la raiz
         // a ApiState lo que corresponda
 

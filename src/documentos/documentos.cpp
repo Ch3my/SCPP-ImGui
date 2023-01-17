@@ -11,6 +11,8 @@
 #include <iomanip>
 #include <locale>
 #include <sstream>
+#include <thread>
+#include <future>
 
 #include <curl/curl.h>
 #include <json/json.h>
@@ -19,7 +21,9 @@
 // su valor entre renderizaciones. Se podria definir la variable como static dentro de la funcion que corresponda
 static ImGuiTableFlags flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
 static Json::Value docs;
-static ImVec2 cell_padding(5.0f, 5.0f);
+static float CELL_PADDING_V = 7.0f;
+static ImVec2 cell_padding(CELL_PADDING_V, CELL_PADDING_V);
+static std::future<Json::Value> promise;
 
 namespace Documentos {
 	// Tenemos que declarar (dentro del namespace) para llamar antes de definir, o dar vuelta las funciones
@@ -33,8 +37,22 @@ namespace Documentos {
 		ImGui::Begin("Documentos");
 
 		if (ImGui::Button("Refresh")) {
-			// TODO llamar get_documentos en otro hilo??
-			docs = get_documentos();
+			// Usamos std::async para llamar a la funcion, Disponible desde C++11
+			// std::async con std::launch::async se asegura de ejecutar la funcion async, problablemente en otro thread
+			// std::async se encarga de crear el thread o de usar uno que ya exista
+			promise = std::async(std::launch::async, get_documentos);
+			std::cout << "ImGUI from " << std::this_thread::get_id() << std::endl;
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Clear")) {
+			docs.clear();
+		}
+
+		// Si la promesa esta ok usamos su resultado
+		if (promise._Is_ready()) {
+			// al llamar .get ya promesa deja de _Is_ready() asi no se 
+			// ejecuta mas de una vez este codigo
+			docs = promise.get();
 		}
 
 		// Crea la tabla con flags, IMPORTANTE, los flags definen si se pueden reodenar y todas esas vainas
@@ -45,7 +63,7 @@ namespace Documentos {
 			// Crea la tabla y configura las columnas, hay mas flags que se podrian aplicar
 			ImGui::TableSetupColumn("Fecha", ImGuiTableColumnFlags_WidthFixed);
 			ImGui::TableSetupColumn("Proposito");
-			ImGui::TableSetupColumn("Monto", ImGuiTableColumnFlags_WidthFixed);
+			ImGui::TableSetupColumn("Monto", ImGuiTableColumnFlags_WidthFixed, 80.0f);
 			ImGui::TableHeadersRow();
 
 			// Primero hacemos loop en el array que no tiene nombre
@@ -60,9 +78,17 @@ namespace Documentos {
 				ImGui::Text(docs[i]["proposito"].asString().c_str());
 				ImGui::TableSetColumnIndex(2);
 
-				int monto = docs[i]["monto"].asInt();
-				//ImGui::Text(FormatNumber::format(monto).c_str());
-
+				// Aparentemente no existe una manera de alinear el texto a la derecha, asi que inventamos este
+				// hack que calcula el ancho del texto y el espacio que sobra le pone un espacio en blanco
+				float textWidth = ImGui::CalcTextSize(docs[i]["montoFormatted"].asString().c_str()).x;
+				// Dummy crea un espacio en blanco con el alto y ancho que se especifica
+				// GetColumnWidth obtiene el width de la columna en la tabla
+				// GetColumnWidth no considera el Padding y queda parte del texto afuera
+				// Debemos considerar en el calculo
+				// Aparentemente ejecutar estos calculos aqui no afecta el rendimiento
+				ImGui::Dummy(ImVec2(ImGui::GetColumnWidth() - textWidth - CELL_PADDING_V * 2, 0.0f));
+				ImGui::SameLine(); // Para que ambos elementos queden en la misma linea, sino no se ve el espacio
+				ImGui::Text(docs[i]["montoFormatted"].asString().c_str());
 			}
 			ImGui::EndTable();
 		}
@@ -72,6 +98,7 @@ namespace Documentos {
 	}
 
 	Json::Value get_documentos() {
+		std::cout << "get_docuentos INit" << std::endl;
 		std::map<std::string, std::string> url_args;
 		url_args.insert({ "fk_tipoDoc", "1" });
 		url_args.insert({ "sessionHash","p0j13h6oockrrou5jfxlf" });
@@ -80,8 +107,13 @@ namespace Documentos {
 
 		Json::Value data = ApiHelper::fn("http://localhost:3000/documentos", url_args, method);
 
-		// TODO Formatear numeros aqui, hacerlo durante el runtime afecta los FPS reduciendo
+		// Formatear numeros aqui, hacerlo durante el runtime afecta los FPS reduciendo
 		// un  50%, dicen que porque una funcion durante el render es demasiado lenta
+		for (Json::Value::ArrayIndex i = 0; i != data.size(); i++) {
+			std::string formattedNumber = FormatNumber::format(data[i]["monto"].asInt(), NULL, NULL);
+			data[i]["montoFormatted"] = formattedNumber;
+		}
+		std::cout << "get_documentos from " << std::this_thread::get_id() << std::endl;
 
 		return data;
 	}

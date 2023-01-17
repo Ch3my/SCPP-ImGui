@@ -7,7 +7,7 @@
 namespace FormatNumber {
 	// TODO crear Overloads para Double, float
 
-	std::string format(int number) {
+	std::string format(int number, int outputWidth, char widthFill) {
 		// TODO. configurar para diferentes formatos de numeros
 		// Formatea el Numero a la 
 		// para establecer cuantos decimales
@@ -25,6 +25,12 @@ namespace FormatNumber {
 		std::stringstream ss;
 		// Para setear la locale por defecto del SO
 		ss.imbue(std::locale(""));
+		if (outputWidth != NULL) {
+			ss.width(outputWidth);
+		}
+		if (widthFill != NULL) {
+			ss.fill(widthFill);
+		}
 		ss << number;
 
 		return ss.str();
