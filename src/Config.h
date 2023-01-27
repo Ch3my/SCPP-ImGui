@@ -1,0 +1,4 @@
+namespace Config
+{
+	void render();
+}

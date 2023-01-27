@@ -3,9 +3,11 @@
 #include <imgui/imgui_impl_dx12.h>
 #include <imgui/imgui_stdlib.h>
 #include <curl/curl.h>
+#include <json/json.h>
 
 #include <stdio.h>
 #include <string>
+#include <iostream>
 #include "../AppState.h"
 #include "../src/helpers/ApiHelper.h"
 
@@ -29,13 +31,24 @@ namespace Login {
 
 		bool btn = ImGui::Button("Login");
 		if (btn) {
-			// comparar char con "" no funcionaba, se utilizo strcmp seguramente
-			// es algo con el boxing o el largo del item
-
 			// Llamar a la API y verificar que la clave corresponde
-			if (strcmp(username, "admin") == 0 && strcmp(pass, "admin") == 0) {
+			Json::Value json_args;
+			json_args["username"] = username;
+			json_args["password"] = pass;
+			
+			Json::Value api_res = ApiHelper::fn(AppState::apiPrefix + "/login", json_args, "POST");
+			if (api_res.isMember("success")) {
+				// Guardar en localstorage.json el sessionHash
+				AppState::sessionHash = api_res["sessionHash"].asString();
+				AppState::save_state_to_file();
+
 				AppState::route = "/documentos";
 			}
+		}
+
+		ImGui::SameLine();
+		if (ImGui::Button("Config")) {
+			AppState::showConfig = true;
 		}
 
 		ImGui::End();

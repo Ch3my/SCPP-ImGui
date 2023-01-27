@@ -90,6 +90,9 @@
     <ClCompile Include="include\imgui\imgui_impl_vulkan.cpp">
       <Filter>Archivos de origen\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="src\Config.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\imgui\imstb_rectpack.h">
@@ -211,6 +214,9 @@
     </ClInclude>
     <ClInclude Include="include\GLFW\glfw3.h">
       <Filter>Archivos de encabezado\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Config.h">
+      <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

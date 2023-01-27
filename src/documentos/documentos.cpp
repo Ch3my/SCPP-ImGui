@@ -24,6 +24,7 @@ static Json::Value docs;
 static float CELL_PADDING_V = 7.0f;
 static ImVec2 cell_padding(CELL_PADDING_V, CELL_PADDING_V);
 static std::future<Json::Value> promise;
+static bool test = false;
 
 namespace Documentos {
 	// Tenemos que declarar (dentro del namespace) para llamar antes de definir, o dar vuelta las funciones
@@ -41,7 +42,6 @@ namespace Documentos {
 			// std::async con std::launch::async se asegura de ejecutar la funcion async, problablemente en otro thread
 			// std::async se encarga de crear el thread o de usar uno que ya exista
 			promise = std::async(std::launch::async, get_documentos);
-			std::cout << "ImGUI from " << std::this_thread::get_id() << std::endl;
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Clear")) {
@@ -69,13 +69,20 @@ namespace Documentos {
 			// Primero hacemos loop en el array que no tiene nombre
 			for (Json::Value::ArrayIndex i = 0; i != docs.size(); i++) {
 				ImGui::TableNextRow();
+				// TODO. Change row Color on Hover. Parece que no hay manera de hacer esto
+				// habra que inventar algo o verlo en actualizacion de ImGui
 
+				
 				// Importante, los indices de columnas van desde 0, sino da error
 				// seguramente por error de indice
 				ImGui::TableSetColumnIndex(0);
 				ImGui::Text(docs[i]["fecha"].asString().c_str());
 				ImGui::TableSetColumnIndex(1);
 				ImGui::Text(docs[i]["proposito"].asString().c_str());
+				if (ImGui::IsItemClicked()) {
+					std::cout<< "Click" << std::endl;
+				}
+
 				ImGui::TableSetColumnIndex(2);
 
 				// Aparentemente no existe una manera de alinear el texto a la derecha, asi que inventamos este
@@ -98,14 +105,17 @@ namespace Documentos {
 	}
 
 	Json::Value get_documentos() {
-		std::cout << "get_docuentos INit" << std::endl;
-		std::map<std::string, std::string> url_args;
-		url_args.insert({ "fk_tipoDoc", "1" });
-		url_args.insert({ "sessionHash","p0j13h6oockrrou5jfxlf" });
+		Json::Value json_args;
+		json_args["fk_tipoDoc"] = 1;
+		json_args["sessionHash"] = AppState::sessionHash;
+		Json::Value data = ApiHelper::fn(AppState::apiPrefix + "/documentos", json_args, "GET");
 
-		std::string method = "POST";
-
-		Json::Value data = ApiHelper::fn("http://localhost:3000/documentos", url_args, method);
+		// isMember crash si tratamos de llamarlo sobre un array
+		// por eso verificamos que sea objeto primero
+		if (data.isObject() && data.isMember("hasErrors")) {
+			// Si hay errores no podemos iterar, debemos mostrar mensaje y salir
+			return NULL;
+		}
 
 		// Formatear numeros aqui, hacerlo durante el runtime afecta los FPS reduciendo
 		// un  50%, dicen que porque una funcion durante el render es demasiado lenta
@@ -113,9 +123,7 @@ namespace Documentos {
 			std::string formattedNumber = FormatNumber::format(data[i]["monto"].asInt(), NULL, NULL);
 			data[i]["montoFormatted"] = formattedNumber;
 		}
-		std::cout << "get_documentos from " << std::this_thread::get_id() << std::endl;
 
 		return data;
 	}
-
 }

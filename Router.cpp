@@ -6,10 +6,17 @@
 
 #include "src/login/Login.h"
 #include "src/documentos/documentos.h"
+#include "src/Config.h"
 
 namespace Router
 {
 	void router() {
+		// Hace una verificacion, si sessionHash existe redirecciona a documentos inmediatamente
+		if (!AppState::sessionHash.empty()) {
+			AppState::route = "/documentos";
+		}
+
+		// ==== ROUTES ====
 		if (AppState::route == "/login") {
 			Login::login_render();
 		}
@@ -22,5 +29,12 @@ namespace Router
 			ImGui::Text(msg.c_str());
 			ImGui::End();
 		}
+
+		// Con un flag diferente a la ruta podemos abrir y cerrar otras ventanas
+		// sin cambiar la ruta
+		if (AppState::showConfig) {
+			Config::render();
+		}
+
 	}
 }

@@ -21,6 +21,8 @@
 
 // APP STUFF
 #include "Router.h"
+#include <iostream>
+#include "AppState.h"
 
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
@@ -480,6 +482,18 @@ int main(int, char**)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+    // ==== APP ====
+    // Cargar datos guardados en archivo json en la raiz
+    // a ApiState lo que corresponda
+    // Lo hacemos fuera del main loop porque sino esta cargando constantemente desde el archivo
+    try {
+        AppState::load_state_from_file();
+    }
+    catch (const std::runtime_error& error) {
+        // Intenta de nuevo. Debio crear el archivo sino existia
+        AppState::load_state_from_file();
+    }
+
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
@@ -514,9 +528,6 @@ int main(int, char**)
         ImGui::ShowDemoWindow();
 
         // ==== APP ====
-        // TODO. Cargar datos guardados en archivo json en la raiz
-        // a ApiState lo que corresponda
-
         // Llamamos al router, que se encarga de renderizar lo que cooresponda
         Router::router();
 
@@ -542,6 +553,10 @@ int main(int, char**)
         if (!main_is_minimized)
             FramePresent(wd);
     }
+
+    // Si se sale del Loop significa que presionaron la X para cerrar la aplicacion
+    // aqui podemos llamar a alguna funcion que guarde el estado antes de salir si fuera necesario
+    std::cout << "On Destroy";
 
     // Cleanup
     err = vkDeviceWaitIdle(g_Device);
