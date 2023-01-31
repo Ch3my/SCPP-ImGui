@@ -7,6 +7,7 @@
 #include "src/login/Login.h"
 #include "src/documentos/documentos.h"
 #include "src/Config.h"
+#include "src/documentos/SingleDoc.h"
 
 namespace Router
 {
@@ -30,10 +31,14 @@ namespace Router
 			ImGui::End();
 		}
 
+		// En vez de flags podriamos crear 2 rutas. Asi se podrian tener hasta 2 ventanas abiertas al mismo tiempo
 		// Con un flag diferente a la ruta podemos abrir y cerrar otras ventanas
 		// sin cambiar la ruta
 		if (AppState::showConfig) {
 			Config::render();
+		}
+		if (AppState::showSingleDoc) {
+			SingleDoc::render();
 		}
 
 	}

@@ -1,6 +1,7 @@
 #include "../AppState.h"
 #include "../src/helpers/ApiHelper.h"
 #include "../src/helpers/FormatNumber.h"
+#include "./SingleDoc.h";
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_win32.h>
@@ -24,7 +25,6 @@ static Json::Value docs;
 static float CELL_PADDING_V = 7.0f;
 static ImVec2 cell_padding(CELL_PADDING_V, CELL_PADDING_V);
 static std::future<Json::Value> promise;
-static bool test = false;
 
 namespace Documentos {
 	// Tenemos que declarar (dentro del namespace) para llamar antes de definir, o dar vuelta las funciones
@@ -80,7 +80,11 @@ namespace Documentos {
 				ImGui::TableSetColumnIndex(1);
 				ImGui::Text(docs[i]["proposito"].asString().c_str());
 				if (ImGui::IsItemClicked()) {
-					std::cout<< "Click" << std::endl;
+					// Seteamos documento en funcion que busca el documento
+					// y lo carga
+					SingleDoc::load_document(docs[i]["id"].asInt());
+					// ahora que ya deberia estar cargado marcamos para que se muestre la ventana
+					AppState::showSingleDoc = true;
 				}
 
 				ImGui::TableSetColumnIndex(2);

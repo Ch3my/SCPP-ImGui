@@ -17,3 +17,8 @@ Como configurar Vulkan aqui: https://vulkan-tutorial.com/Development_environment
 Al cambiarse a Vulkan fue necesario eliminar las referencias a impl_directx porque parece que entraban en conflicto. 
 El proyecto puede volver a Direct12 cambiando el App.cpp al que tiene Direct12 y agregando los archivos Impl de Directx12
 de nuevo al proyecto. NOTA, los archivos estan el la carpeta pero se quitaron del proyecto solamente
+
+NOTA
+
+ImGUI no tiene un datePicker asi que se tuvo que incluir un addon (desde https://github.com/Flix01/imgui) y este usa funciones deprecadas
+se incluyo _CRT_SECURE_NO_WARNINGS en Project -> Properties -> C/C++ -> Preprocessor -> Preprocessor Definitions" add _CRT_SECURE_NO_WARNINGS. Deberia modificar el archivo para eliminar las funciones deprecadas, no son muchas.

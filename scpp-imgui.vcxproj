@@ -109,7 +109,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -152,8 +152,10 @@
     <ClCompile Include="Router.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\documentos\documentos.cpp" />
+    <ClCompile Include="src\documentos\SingleDoc.cpp" />
     <ClCompile Include="src\helpers\ApiHelper.cpp" />
     <ClCompile Include="src\helpers\FormatNumber.cpp" />
+    <ClCompile Include="src\helpers\imguidatechooser.cpp" />
     <ClCompile Include="src\jsoncpp\jsoncpp.cpp" />
     <ClCompile Include="src\login\Login.cpp" />
   </ItemGroup>
@@ -193,12 +195,23 @@
     <ClInclude Include="include\json\value.h" />
     <ClInclude Include="include\json\version.h" />
     <ClInclude Include="include\json\writer.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Router.h" />
     <ClInclude Include="src\Config.h" />
     <ClInclude Include="src\documentos\documentos.h" />
+    <ClInclude Include="src\documentos\SingleDoc.h" />
     <ClInclude Include="src\helpers\ApiHelper.h" />
     <ClInclude Include="src\helpers\FormatNumber.h" />
+    <ClInclude Include="src\helpers\imguidatechooser.h" />
     <ClInclude Include="src\login\Login.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="docs\Logo.ico" />
+    <Image Include="docs\Logo.png" />
+    <Image Include="icon1.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

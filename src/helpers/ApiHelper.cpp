@@ -28,16 +28,23 @@ namespace ApiHelper {
 		std::string result;
 		for (auto it = json.begin(); it != json.end(); ++it) {
 			if (it->isString()) {
-				result += it.name() + "=" + it->asString() +"&";
+				result += it.name() + "=" + it->asString() + "&";
 			}
 			if (it->isInt()) {
 				result += it.name() + "=" + std::to_string(it->asInt()) + "&";
 			}
+			if (it->isArray()) {
+				std::string field_name = it.name();
+				for (auto deep = it->begin(); deep != it->end(); deep++) {
+					if (deep->isInt()) {
+						result += field_name + "[]=" + std::to_string(deep->asInt()) + "&";
+					}
+				}
+			}
 		}
-
 		// Elimna ultimo & que quedo
 		result.pop_back();
-		// std::cout << result << std::endl;
+		//std::cout << result << std::endl;
 		return result;
 	}
 
@@ -69,7 +76,8 @@ namespace ApiHelper {
 		CURLcode res;
 		std::string response_string;
 		std::string processed_req_string = url + "?" + json_to_url_params(json_args);
-
+		// std::cout << processed_req_string << std::endl;
+		
 		// Iniciamos cURL y configuramos headers y todo lo necesario
 		// para un GET
 		curl = curl_easy_init();

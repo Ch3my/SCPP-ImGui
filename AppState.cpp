@@ -11,6 +11,7 @@ namespace AppState
 	std::string sessionHash = "";
 	std::string apiPrefix = "";
 	bool showConfig = false;
+	bool showSingleDoc = false;
 
 	void create_localstorage_file() {
 		// Crea el archivo y le pone datos vacios. Sera la primera vez que abren la App
