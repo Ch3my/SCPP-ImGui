@@ -23,7 +23,9 @@
 #include "Router.h"
 #include <iostream>
 #include "AppState.h"
-
+#include "src/helpers/IconsMaterialDesign.h"
+#include <string>
+#include <iostream>
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
@@ -409,7 +411,10 @@ int main(int, char**)
     ImGuiStyle& style = ImGui::GetStyle();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
-        style.WindowRounding = 0.0f;
+        // === APP Window Rounding ===
+        style.WindowRounding = 3.0f;
+        style.FrameRounding = 3.0f;
+
         style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
 
@@ -446,6 +451,12 @@ int main(int, char**)
     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
     //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
     //IM_ASSERT(font != NULL);
+
+    // ==== ICON FONT APP ====
+    // Carga la fuente de Material Design de Google
+    static const ImWchar icons_ranges[] = { ICON_MIN_MD, ICON_MAX_16_MD, 0 };
+    ImFontConfig icons_config; icons_config.MergeMode = true; icons_config.PixelSnapH = true;
+    io.Fonts->AddFontFromFileTTF("assets/" FONT_ICON_FILE_NAME_MD, 22.0f, &icons_config, icons_ranges);
 
     // Upload Fonts
     {

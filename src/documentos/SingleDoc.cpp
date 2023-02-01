@@ -5,6 +5,9 @@
 #include "../AppState.h"
 #include "../helpers/ApiHelper.h"
 #include "../helpers/Utilities.h"
+#include "./TipoDocPicker.h"
+#include "./CategoriaPicker.h"
+#include "../helpers/FormatNumber.h"
 
 #include <json/json.h>
 
@@ -18,11 +21,25 @@ namespace SingleDoc {
 	static int id = NULL;
 	static std::string proposito = "";
 	static int monto = NULL;
+	static std::string monto_text = "";
 	// Inicializa como cero
 	// tambien se podria setear a cero asi
 	// strptime (timestamp_str, "%Y/%m/%d %H:%M:%S",&file_timestamp); ?
 	static tm fecha = { 0 };
 	const char* dateFormat = "%d/%m/%Y";
+	int fk_tipo_doc = 1; // 1 = Gasto, carga por defecto
+	int fk_categoria = 2; // 2 = Gasolina, carga por defecto
+
+	void reset() {
+		// Resetea valores de esta clase
+		id = NULL;
+		monto = NULL;
+		monto_text = "";
+		proposito = "";
+		fecha = { 0 };
+		fk_tipo_doc = 1;
+		fk_categoria = 2;
+	}
 
 	void load_document(int id) {
 		// Nos pasan un id de Documento y cargamos sus datos en la clase
@@ -35,29 +52,28 @@ namespace SingleDoc {
 		// Deberia venir solo 1 resultado
 		if (api_result.isArray()) {
 			proposito = api_result[0]["proposito"].asString();
+			// al guardar monto se convertida al int de monto_text, definimos aqui solo por estandar
+			// para que no quede indefinida?
 			monto = api_result[0]["monto"].asInt();
+			// carga como numero/texto ya con separador de miles
+			monto_text = FormatNumber::format(api_result[0]["monto"].asInt(), NULL, NULL);
 
 			std::vector<std::string> t = Utilities::SplitString(api_result[0]["fecha"].asString(), "-");
+			int year = std::stoi(t.at(0));
+			int month = std::stoi(t.at(1));
+			int day = std::stoi(t.at(2));
+			Utilities::SetTmDate(fecha, year, month, day);
 
-			memset(&fecha, 0, sizeof(tm));     // Mandatory for emscripten. Please do not remove!
-			fecha.tm_isdst = -1;
-			fecha.tm_sec = 0;		//	 Seconds.	[0-60] (1 leap second)
-			fecha.tm_min = 0;		//	 Minutes.	[0-59]
-			fecha.tm_hour = 0;		//	 Hours.	[0-23]
-			fecha.tm_wday = 0;     //	 Day of week.	[0-6]
-			fecha.tm_yday = 0;		//	 Days in year.[0-365]
-
-			// El año se cuenta relativo a 1900. Entonces si estamos en 2023 el año es 123 (2023 - 1900)
-			fecha.tm_year = std::stoi(t.at(0)) - 1900;
-			// El mes comienza el mes 0
-			fecha.tm_mon = std::stoi(t.at(1)) - 1;
-			fecha.tm_mday = std::stoi(t.at(2));
+			// Carga tipoDoc y Categoria
+			fk_tipo_doc = api_result[0]["fk_tipoDoc"].asInt();
+			fk_categoria = api_result[0]["fk_categoria"].asInt();
 		}
 	}
 
 	void render() {
 		static bool show_window = true;
 		if (!show_window) {
+			reset(); // Limpiamos variables, no se mezclan variables si crean doc nuevo
 			AppState::showSingleDoc = false;
 			show_window = true;
 		}
@@ -77,7 +93,19 @@ namespace SingleDoc {
 		// Seteamos un espacion entre items, El mismo espacio para mantener
 		// la linea con los otros inputs del formulario
 		ImGui::SameLine(80);
-		ImGui::InputInt("##inputmonto", &monto);
+
+		// Tratamos a monto como std::string porque tenemos que formatearlo con separador de miles
+		// no acepta decimales ni otra cosa. ImGui parece que no tiene una manera de hacer esto
+		// mejor
+		ImGui::InputText("##montotext", &monto_text);
+		// Equivalente al evento onChange de JS. Escucha por el elemento Anterior
+		if (ImGui::IsItemDeactivatedAfterEdit()) {
+			// Si esta vacio no hacemos nada. Da error el ejecutar stoi en string vacio
+			if (!monto_text.empty()) {
+				monto_text = Utilities::get_digits(monto_text, false);
+				monto_text = FormatNumber::format(std::stoi(monto_text), NULL, NULL);
+			}
+		}
 
 		ImGui::Text("Proposito");
 		ImGui::SameLine(80);
@@ -91,9 +119,17 @@ namespace SingleDoc {
 		}
 		ImGui::PopItemWidth();
 
-
 		ImGui::Text("Tipo Doc");
-		ImGui::Text("Categoria");
+		ImGui::SameLine(80);
+		TipoDocPicker::render(fk_tipo_doc);
+
+		if (fk_tipo_doc == 1) {
+			// Solo mostramos categoria si tipo_doc es 1. Luego al guardar categoria pasara como null
+			// si el tipo_doc es diferente de Gasto
+			ImGui::Text("Categoria");
+			ImGui::SameLine(80);
+			CategoriaPicker::render(fk_categoria);
+		}
 
 		ImGui::End();
 	}

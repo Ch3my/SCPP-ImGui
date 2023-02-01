@@ -99,6 +99,15 @@
     <ClCompile Include="src\helpers\imguidatechooser.cpp">
       <Filter>Archivos de origen\helpers</Filter>
     </ClCompile>
+    <ClCompile Include="src\documentos\TipoDocPicker.cpp">
+      <Filter>Archivos de origen\documentos</Filter>
+    </ClCompile>
+    <ClCompile Include="src\documentos\CategoriaPicker.cpp">
+      <Filter>Archivos de origen\documentos</Filter>
+    </ClCompile>
+    <ClCompile Include="src\helpers\Utilities.cpp">
+      <Filter>Archivos de origen\helpers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\imgui\imstb_rectpack.h">
@@ -231,6 +240,18 @@
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="src\helpers\imguidatechooser.h">
+      <Filter>Archivos de encabezado\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\documentos\TipoDocPicker.h">
+      <Filter>Archivos de encabezado\documentos</Filter>
+    </ClInclude>
+    <ClInclude Include="src\documentos\CategoriaPicker.h">
+      <Filter>Archivos de encabezado\documentos</Filter>
+    </ClInclude>
+    <ClInclude Include="src\helpers\Utilities.h">
+      <Filter>Archivos de encabezado\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\helpers\IconsMaterialDesign.h">
       <Filter>Archivos de encabezado\helpers</Filter>
     </ClInclude>
   </ItemGroup>

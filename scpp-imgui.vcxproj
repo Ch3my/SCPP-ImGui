@@ -151,11 +151,14 @@
     <ClCompile Include="include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Router.cpp" />
     <ClCompile Include="src\Config.cpp" />
+    <ClCompile Include="src\documentos\CategoriaPicker.cpp" />
     <ClCompile Include="src\documentos\documentos.cpp" />
     <ClCompile Include="src\documentos\SingleDoc.cpp" />
+    <ClCompile Include="src\documentos\TipoDocPicker.cpp" />
     <ClCompile Include="src\helpers\ApiHelper.cpp" />
     <ClCompile Include="src\helpers\FormatNumber.cpp" />
     <ClCompile Include="src\helpers\imguidatechooser.cpp" />
+    <ClCompile Include="src\helpers\Utilities.cpp" />
     <ClCompile Include="src\jsoncpp\jsoncpp.cpp" />
     <ClCompile Include="src\login\Login.cpp" />
   </ItemGroup>
@@ -198,11 +201,15 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="Router.h" />
     <ClInclude Include="src\Config.h" />
+    <ClInclude Include="src\documentos\CategoriaPicker.h" />
     <ClInclude Include="src\documentos\documentos.h" />
     <ClInclude Include="src\documentos\SingleDoc.h" />
+    <ClInclude Include="src\documentos\TipoDocPicker.h" />
     <ClInclude Include="src\helpers\ApiHelper.h" />
     <ClInclude Include="src\helpers\FormatNumber.h" />
+    <ClInclude Include="src\helpers\IconsMaterialDesign.h" />
     <ClInclude Include="src\helpers\imguidatechooser.h" />
+    <ClInclude Include="src\helpers\Utilities.h" />
     <ClInclude Include="src\login\Login.h" />
   </ItemGroup>
   <ItemGroup>

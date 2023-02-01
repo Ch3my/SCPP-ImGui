@@ -2,6 +2,7 @@
 #include "../src/helpers/ApiHelper.h"
 #include "../src/helpers/FormatNumber.h"
 #include "./SingleDoc.h";
+#include "../helpers/IconsMaterialDesign.h"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_win32.h>
@@ -37,16 +38,23 @@ namespace Documentos {
 		ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, cell_padding);
 		ImGui::Begin("Documentos");
 
-		if (ImGui::Button("Refresh")) {
+		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 1.4f));
+		if (ImGui::Button(ICON_MD_REFRESH, ImVec2(30.0f, 30.0f))) {
 			// Usamos std::async para llamar a la funcion, Disponible desde C++11
 			// std::async con std::launch::async se asegura de ejecutar la funcion async, problablemente en otro thread
 			// std::async se encarga de crear el thread o de usar uno que ya exista
 			promise = std::async(std::launch::async, get_documentos);
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("Clear")) {
+		if (ImGui::Button(ICON_MD_CLEAR_ALL, ImVec2(30.0f, 30.0f))) {
 			docs.clear();
 		}
+		ImGui::SameLine();
+		if (ImGui::Button(ICON_MD_ADD_CIRCLE, ImVec2(30.0f, 30.0f))) {
+			SingleDoc::reset(); // Resetamos antes por si acaso
+			AppState::showSingleDoc = true;
+		}
+		ImGui::PopStyleVar();
 
 		// Si la promesa esta ok usamos su resultado
 		if (promise._Is_ready()) {
