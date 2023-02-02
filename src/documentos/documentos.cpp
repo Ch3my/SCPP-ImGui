@@ -1,8 +1,10 @@
 #include "../AppState.h"
 #include "../src/helpers/ApiHelper.h"
 #include "../src/helpers/FormatNumber.h"
-#include "./SingleDoc.h";
+#include "../src/helpers/Utilities.h"
+#include "SingleDoc.h"
 #include "../helpers/IconsMaterialDesign.h"
+#include "TipoDocPicker.h"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_win32.h>
@@ -12,27 +14,36 @@
 #include <iostream>
 #include <iomanip>
 #include <locale>
-#include <sstream>
-#include <thread>
 #include <future>
 
 #include <curl/curl.h>
 #include <json/json.h>
 
-// Define variables fuera de la clase para no estar definiendolas todo el rato o para conservar
-// su valor entre renderizaciones. Se podria definir la variable como static dentro de la funcion que corresponda
-static ImGuiTableFlags flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
-static Json::Value docs;
-static float CELL_PADDING_V = 7.0f;
-static ImVec2 cell_padding(CELL_PADDING_V, CELL_PADDING_V);
-static std::future<Json::Value> promise;
-
 namespace Documentos {
+	// static para que no de error de linking por una variable del mismo nombre en otro archivo
+	// Aunque los namespaces nos ayudan a evitar eso tambien
+	static int fk_tipo_doc = 1; // 1 = Gasto, carga por defecto
+
+	// No static para que pueda ser accedidas por otros archivos, al estar fuera de la funcion
+	// se convierte en una variable global el namespace. Tambien fue declarada en el Header
+	// para que otros archivos sepan que existe
+	static Json::Value docs;
+
 	// Tenemos que declarar (dentro del namespace) para llamar antes de definir, o dar vuelta las funciones
 	Json::Value get_documentos();
 
 	void render() {
 		// Al setear la variable como static no se pierde entre renderizaciones
+		static std::future<Json::Value> promise;		
+
+		// Estas variables se pierden entre renderizaciones pero como son flags nomas
+		// en teoria no hace diferencia, de usarse se usan durante el mismo ciclo que se definieron
+		// asi podemos liberar memoria ?
+		bool selected_row = false;
+		bool tipo_doc_combo_changed = false;
+		float CELL_PADDING_V = 7.0f;
+		ImVec2 cell_padding(CELL_PADDING_V, CELL_PADDING_V);
+		ImGuiTableFlags table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_PadOuterX;
 
 		// Aplica un stilo a la ventana, importante llamar antes del Begin
 		ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, cell_padding);
@@ -55,7 +66,17 @@ namespace Documentos {
 			AppState::showSingleDoc = true;
 		}
 		ImGui::PopStyleVar();
-
+		ImGui::SameLine();
+		TipoDocPicker::render(fk_tipo_doc, tipo_doc_combo_changed);
+		ImGui::Spacing();
+		if (tipo_doc_combo_changed) {
+			// Si el flag indica que el combo cambio (true aun si seleccionan el mismo)
+			// llamamos a documentos en otro hilo, y otra pregunta revisa si el hilo devolvio
+			// y carga los documentos
+			promise = std::async(std::launch::async, get_documentos);
+			// Reseteamos Flag para que no se ejecute de nuevo este codigo
+			tipo_doc_combo_changed = false;
+		}
 		// Si la promesa esta ok usamos su resultado
 		if (promise._Is_ready()) {
 			// al llamar .get ya promesa deja de _Is_ready() asi no se 
@@ -67,7 +88,7 @@ namespace Documentos {
 		// IMPORTANTE. La creacion de la tabla va en un IF porque sino al collapse la ventana da error
 		// seguramente porque la tabla no existe y esta tratando de definir sobre algo que no existe, entonces
 		// el if sino existe la tabla se salta todo ese codigo y no da error :D
-		if (ImGui::BeginTable("docs", 3, flags)) {
+		if (ImGui::BeginTable("docs", 3, table_flags)) {
 			// Crea la tabla y configura las columnas, hay mas flags que se podrian aplicar
 			ImGui::TableSetupColumn("Fecha", ImGuiTableColumnFlags_WidthFixed);
 			ImGui::TableSetupColumn("Proposito");
@@ -80,19 +101,19 @@ namespace Documentos {
 				// TODO. Change row Color on Hover. Parece que no hay manera de hacer esto
 				// habra que inventar algo o verlo en actualizacion de ImGui
 
-				
 				// Importante, los indices de columnas van desde 0, sino da error
 				// seguramente por error de indice
 				ImGui::TableSetColumnIndex(0);
 				ImGui::Text(docs[i]["fecha"].asString().c_str());
 				ImGui::TableSetColumnIndex(1);
-				ImGui::Text(docs[i]["proposito"].asString().c_str());
-				if (ImGui::IsItemClicked()) {
+				ImGui::Selectable(docs[i]["proposito"].asString().c_str(), &selected_row);
+				if (selected_row) {
 					// Seteamos documento en funcion que busca el documento
 					// y lo carga
 					SingleDoc::load_document(docs[i]["id"].asInt());
 					// ahora que ya deberia estar cargado marcamos para que se muestre la ventana
 					AppState::showSingleDoc = true;
+					selected_row = false;
 				}
 
 				ImGui::TableSetColumnIndex(2);
@@ -110,16 +131,39 @@ namespace Documentos {
 				ImGui::Text(docs[i]["montoFormatted"].asString().c_str());
 			}
 			ImGui::EndTable();
+
+			// Si no hay documentos mostramos mensaje informativo
+			if (docs.empty()) {
+				const char* no_doc_msg = "No hay Documentos";
+				// Para centrar el Texto. Se podria aplicar quizas tambien para alinear el los numeros a la derecha en la tabla
+				// pero dejamos ambos a metodo de ejemplo
+				ImGui::SetCursorPosX((ImGui::GetWindowWidth() - ImGui::CalcTextSize(no_doc_msg).x) / 2.f);
+				ImGui::Text(no_doc_msg);
+			}
+
 		}
 		ImGui::End();
 		// Limpia un stilo a la ventana, importante llamar despues del END
 		ImGui::PopStyleVar();
 	}
 
-	Json::Value get_documentos() {
+	static Json::Value get_documentos() {
 		Json::Value json_args;
-		json_args["fk_tipoDoc"] = 1;
+		json_args["fk_tipoDoc"] = fk_tipo_doc;
 		json_args["sessionHash"] = AppState::sessionHash;
+		if (fk_tipo_doc == 1) {
+			// Gasto ve mes Actual
+			std::vector<std::string> month_range = Utilities::GetCurrentMonthRange();
+			json_args["fechaInicio"] = month_range.at(0);
+			json_args["fechaTermino"] = month_range.at(1);
+		}
+		if (fk_tipo_doc == 2 || fk_tipo_doc == 3) {
+			// Otros ven todo el año actual
+			std::vector<std::string> year_range = Utilities::GetCurrentYearRange();
+			json_args["fechaInicio"] = year_range.at(0);
+			json_args["fechaTermino"] = year_range.at(1);
+		}
+
 		Json::Value data = ApiHelper::fn(AppState::apiPrefix + "/documentos", json_args, "GET");
 
 		// isMember crash si tratamos de llamarlo sobre un array

@@ -209,6 +209,7 @@
     <ClInclude Include="src\helpers\FormatNumber.h" />
     <ClInclude Include="src\helpers\IconsMaterialDesign.h" />
     <ClInclude Include="src\helpers\imguidatechooser.h" />
+    <ClInclude Include="src\helpers\TimerC.h" />
     <ClInclude Include="src\helpers\Utilities.h" />
     <ClInclude Include="src\login\Login.h" />
   </ItemGroup>

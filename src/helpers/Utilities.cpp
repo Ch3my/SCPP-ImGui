@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <chrono>
 
 namespace Utilities {
 	std::vector<std::string> SplitString(
@@ -78,4 +79,57 @@ namespace Utilities {
 		date.tm_mday = day;
 	}
 
+	std::string get_current_time_and_date()
+	{
+		auto const time = std::chrono::current_zone()
+			->to_local(std::chrono::system_clock::now());
+		return std::format("{:%Y-%m-%d %X}", time);
+	}
+
+	std::vector<std::string> GetCurrentMonthRange() {
+		// Entrega el primer y ultimo dia de el mes actual
+		std::stringstream ss_inicio;
+		std::stringstream ss_fin;
+
+		// Se basa en la hora actual para tener el mes y año que corresponde
+		const std::chrono::time_point now{ std::chrono::system_clock::now() };
+		const std::chrono::year_month_day ymd{ std::chrono::floor<std::chrono::days>(now) };
+
+		// Creamos la fecha inicio
+		const std::chrono::year_month_day inicio_mes{ ymd.year() / ymd.month() / 1 };
+
+		// Creamos la fecha final 
+		const std::chrono::year_month_day fin_mes{ ymd.year() / ymd.month() / std::chrono::last };
+
+		// Guarda los strings en stream que vamos a accesar para obtener informacion
+		ss_inicio << std::format("{:%Y-%m-%d}", inicio_mes);
+		ss_fin << std::format("{:%Y-%m-%d}", fin_mes);
+
+		// Crea array que va a devolver
+		std::vector<std::string> result = { ss_inicio.str(), ss_fin.str() };
+		return result;
+	}
+	std::vector<std::string> GetCurrentYearRange() {
+		// Entrega el primer y ultimo dia de el año actual
+		std::stringstream ss_inicio;
+		std::stringstream ss_fin;
+
+		// Se basa en la hora actual para tener el mes y año que corresponde
+		const std::chrono::time_point now{ std::chrono::system_clock::now() };
+		const std::chrono::year_month_day ymd{ std::chrono::floor<std::chrono::days>(now) };
+
+		// Creamos la fecha inicio
+		const std::chrono::year_month_day inicio_year{ ymd.year() / 1 / 1 };
+
+		// Creamos la fecha final 
+		const std::chrono::year_month_day fin_year{ ymd.year() / 12 / std::chrono::last };
+
+		// Guarda los strings en stream que vamos a accesar para obtener informacion
+		ss_inicio << std::format("{:%Y-%m-%d}", inicio_year);
+		ss_fin << std::format("{:%Y-%m-%d}", fin_year);
+
+		// Crea array que va a devolver
+		std::vector<std::string> result = { ss_inicio.str(), ss_fin.str() };
+		return result;
+	}
 }

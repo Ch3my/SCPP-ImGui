@@ -254,6 +254,9 @@
     <ClInclude Include="src\helpers\IconsMaterialDesign.h">
       <Filter>Archivos de encabezado\helpers</Filter>
     </ClInclude>
+    <ClInclude Include="src\helpers\TimerC.h">
+      <Filter>Archivos de encabezado\helpers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">
