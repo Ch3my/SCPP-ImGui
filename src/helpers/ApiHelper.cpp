@@ -77,7 +77,7 @@ namespace ApiHelper {
 		std::string response_string;
 		std::string processed_req_string = url + "?" + json_to_url_params(json_args);
 		// std::cout << processed_req_string << std::endl;
-		
+
 		// Iniciamos cURL y configuramos headers y todo lo necesario
 		// para un GET
 		curl = curl_easy_init();
@@ -94,20 +94,21 @@ namespace ApiHelper {
 			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &callback);
 			curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_string);
 			res = curl_easy_perform(curl);
-			curl_easy_cleanup(curl);
 
 			long http_code = 0;
 			curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
 			if (http_code >= 300 && res == CURLE_ABORTED_BY_CALLBACK) {
 				std::cout << "Fallo al comsumir la API: " << http_code << std::endl;
 			}
+			/* always cleanup */
+			curl_slist_free_all(headers);
+			curl_easy_cleanup(curl);
 		}
 		curl_global_cleanup();
-		//std::cout << response_string;
 		return response_string;
 	}
 
-	std::string api_call_post(std::string url, Json::Value json_args) {
+	std::string api_call_custom(std::string url, Json::Value json_args, const char* method) {
 		CURL* curl;
 		CURLcode res;
 		std::string response_string;
@@ -130,7 +131,8 @@ namespace ApiHelper {
 			curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
 			curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-			curl_easy_setopt(curl, CURLOPT_POST, 1L);
+			//curl_easy_setopt(curl, CURLOPT_POST, 1L);
+			curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method);
 			/* Now specify the POST data */
 			curl_easy_setopt(curl, CURLOPT_POSTFIELDS, parsed_args.c_str());
 			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &callback);
@@ -145,10 +147,10 @@ namespace ApiHelper {
 			}
 
 			/* always cleanup */
+			curl_slist_free_all(headers);
 			curl_easy_cleanup(curl);
 		}
 		curl_global_cleanup();
-		std::cout << response_string << std::endl;
 		return response_string;
 	}
 
@@ -160,8 +162,8 @@ namespace ApiHelper {
 		Json::Value json_data;
 		Json::Reader json_reader;
 
-		if (method == "POST") {
-			json_string = api_call_post(url, json_args);
+		if (method == "POST" || method == "DELETE" || method == "PUT") {
+			json_string = api_call_custom(url, json_args, method.c_str());
 		}
 		if (method == "GET") {
 			json_string = api_call_get(url, json_args);
@@ -178,7 +180,9 @@ namespace ApiHelper {
 		}
 		else
 		{
-			std::cout << "Error parsing JSON" << std::endl;
+			std::cout << "Error parsing JSON calling: " << method << " " << url << std::endl;
+			std::cout << json_args << std::endl;
+			std::cout << "API respondio " << json_string << std::endl;
 		}
 
 		return json_data;

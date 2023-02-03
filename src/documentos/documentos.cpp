@@ -23,19 +23,20 @@ namespace Documentos {
 	// static para que no de error de linking por una variable del mismo nombre en otro archivo
 	// Aunque los namespaces nos ayudan a evitar eso tambien
 	static int fk_tipo_doc = 1; // 1 = Gasto, carga por defecto
+	static std::future<Json::Value> promise;
+	static bool mounted = false;
 
-	// No static para que pueda ser accedidas por otros archivos, al estar fuera de la funcion
-	// se convierte en una variable global el namespace. Tambien fue declarada en el Header
-	// para que otros archivos sepan que existe
 	static Json::Value docs;
 
 	// Tenemos que declarar (dentro del namespace) para llamar antes de definir, o dar vuelta las funciones
 	Json::Value get_documentos();
+	void reload_docs();
 
 	void render() {
-		// Al setear la variable como static no se pierde entre renderizaciones
-		static std::future<Json::Value> promise;		
-
+		if (!mounted) {
+			reload_docs();
+			mounted = true;
+		}
 		// Estas variables se pierden entre renderizaciones pero como son flags nomas
 		// en teoria no hace diferencia, de usarse se usan durante el mismo ciclo que se definieron
 		// asi podemos liberar memoria ?
@@ -51,10 +52,7 @@ namespace Documentos {
 
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 1.4f));
 		if (ImGui::Button(ICON_MD_REFRESH, ImVec2(30.0f, 30.0f))) {
-			// Usamos std::async para llamar a la funcion, Disponible desde C++11
-			// std::async con std::launch::async se asegura de ejecutar la funcion async, problablemente en otro thread
-			// std::async se encarga de crear el thread o de usar uno que ya exista
-			promise = std::async(std::launch::async, get_documentos);
+			reload_docs();
 		}
 		ImGui::SameLine();
 		if (ImGui::Button(ICON_MD_CLEAR_ALL, ImVec2(30.0f, 30.0f))) {
@@ -73,7 +71,7 @@ namespace Documentos {
 			// Si el flag indica que el combo cambio (true aun si seleccionan el mismo)
 			// llamamos a documentos en otro hilo, y otra pregunta revisa si el hilo devolvio
 			// y carga los documentos
-			promise = std::async(std::launch::async, get_documentos);
+			reload_docs();
 			// Reseteamos Flag para que no se ejecute de nuevo este codigo
 			tipo_doc_combo_changed = false;
 		}
@@ -147,7 +145,7 @@ namespace Documentos {
 		ImGui::PopStyleVar();
 	}
 
-	static Json::Value get_documentos() {
+	Json::Value get_documentos() {
 		Json::Value json_args;
 		json_args["fk_tipoDoc"] = fk_tipo_doc;
 		json_args["sessionHash"] = AppState::sessionHash;
@@ -165,7 +163,10 @@ namespace Documentos {
 		}
 
 		Json::Value data = ApiHelper::fn(AppState::apiPrefix + "/documentos", json_args, "GET");
-
+		if (data == NULL) {
+			std::cout << "Error de comunicacion con la Firma?" << std::endl;
+			return NULL;
+		}
 		// isMember crash si tratamos de llamarlo sobre un array
 		// por eso verificamos que sea objeto primero
 		if (data.isObject() && data.isMember("hasErrors")) {
@@ -179,7 +180,21 @@ namespace Documentos {
 			std::string formattedNumber = FormatNumber::format(data[i]["monto"].asInt(), NULL, NULL);
 			data[i]["montoFormatted"] = formattedNumber;
 		}
-
 		return data;
+	}
+
+	// No es static para que la llamen de otros archivos
+	void reload_docs() {
+		// Ejecuta Async, dentro de la funcion render se verifica si la promesa esta lista
+		// y carga si corresponde, esa funcion se ejecuta constantemente, si quisieramos hacer algo asi aqui
+		// tendriamos que hacer .get aqui mismo y entonces no seria multithread
+
+		// Usamos std::async para llamar a la funcion, Disponible desde C++11
+		// std::async con std::launch::async se asegura de ejecutar la funcion async, problablemente en otro thread
+		// std::async se encarga de crear el thread o de usar uno que ya exista
+		promise = std::async(std::launch::async, get_documentos);
+
+		// NOTA. sino se esta ejecutando render la promesa queda por ahi dando vueltas??
+		// porque no se llama a .get?
 	}
 }

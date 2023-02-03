@@ -32,13 +32,16 @@ namespace SingleDoc {
 	static int fk_tipo_doc = 1; // 1 = Gasto, carga por defecto
 	static int fk_categoria = 2; // 2 = Gasolina, carga por defecto
 	static std::future<bool> promise;
+	static std::future<bool> delete_promise;
 	static std::future<int> timeout_result;
 
 	static bool show_window = true;
 	static bool show_msg = false;
+	static std::string feedback_msg = "";
 
 	// Solo declaracion, definimos mas abajo
-	static bool save_document();
+	static bool save_document(bool is_update);
+	static bool delete_document();
 
 	// No static porque se llama de otros archivos
 	void reset() {
@@ -50,14 +53,14 @@ namespace SingleDoc {
 		fk_tipo_doc = 1;
 		fk_categoria = 2;
 	}
-	
+
 	static bool save_to_cloud() {
 		bool result = false;
 		if (id != NULL) {
-
+			result = save_document(true);
 		}
 		if (id == NULL) {
-			result = save_document();
+			result = save_document(false);
 		}
 		return result;
 	}
@@ -90,7 +93,7 @@ namespace SingleDoc {
 		}
 	}
 
-	static bool save_document() {
+	static bool save_document(bool is_update) {
 		// Tomamos datos del formulario y convertimos en argument JSON
 		// para hacer POST a la API
 		Json::Value args;
@@ -109,7 +112,7 @@ namespace SingleDoc {
 			args["fk_categoria"] = fk_categoria;
 		}
 		args["proposito"] = proposito;
-		int current_monto = std::stoi( Utilities::get_digits(monto_text, false));
+		int current_monto = std::stoi(Utilities::get_digits(monto_text, false));
 		args["monto"] = current_monto;
 
 		// Ajustamos formato de la fecha antes de enviar
@@ -117,11 +120,41 @@ namespace SingleDoc {
 		formatted_fecha << std::put_time(&fecha, "%Y-%m-%d");
 		args["fecha"] = formatted_fecha.str();
 
-		Json::Value api_result = ApiHelper::fn(AppState::apiPrefix + "/documentos", args, "POST");
+		std::string method = "POST";
+		// Si es una modificacion, modificamos metodo y añadimos
+		// id que falta
+		if (is_update) {
+			args["id"] = id;
+			method = "PUT";
+		}
+
+		Json::Value api_result = ApiHelper::fn(AppState::apiPrefix + "/documentos", args, method);
 
 		if (api_result.isMember("hasErrors")) {
 			return false;
 		}
+		// Como la pantalla de documentos esta ejecutando render por estar abierta
+		// llamamos funcion que asigna promesa que existe en ese archivo
+		// y recarga los documentos en otro hilo
+		Documentos::reload_docs();
+		return true;
+	}
+
+	static bool delete_document() {
+		Json::Value args;
+		args["sessionHash"] = AppState::sessionHash;
+		args["id"] = id;
+
+		Json::Value api_result = ApiHelper::fn(AppState::apiPrefix + "/documentos", args, "DELETE");
+
+		if (api_result.isMember("hasErrors")) {
+			return false;
+		}
+
+		// Como la pantalla de documentos esta ejecutando render por estar abierta
+		// llamamos funcion que asigna promesa que existe en ese archivo
+		// y recarga los documentos en otro hilo
+		Documentos::reload_docs();
 		return true;
 	}
 
@@ -157,7 +190,7 @@ namespace SingleDoc {
 		// SI flag indica mostramos mensaje y setemamos otro hilo con
 		// timeout para eliminar el mensaje
 		if (show_msg) {
-			ImGui::Text("Exito grabando en API " ICON_MD_SENTIMENT_VERY_SATISFIED);
+			ImGui::Text(feedback_msg.c_str());
 			ImGui::Separator();
 			ImGui::Spacing();
 		}
@@ -165,6 +198,7 @@ namespace SingleDoc {
 			// Llamamos a Get para que se muera el hilo (deja de estar is_ready y C++ se encarga de matarlo?)
 			timeout_result.get();
 			show_msg = false;
+			feedback_msg = "";
 		}
 
 		// Para que nos quede los botones queden centrados
@@ -173,10 +207,14 @@ namespace SingleDoc {
 			// Pasamos en otro Hilo para no pegar el hilo de la renderizacion del la GUI
 			promise = std::async(std::launch::async, save_to_cloud);
 		}
+
+		// Listener save_to_cloud
 		if (promise._Is_ready()) {
 			// Si es true tuvimos exito
 			if (promise.get()) {
 				// Mostramos Mensaje
+				reset();
+				feedback_msg = "Documento grabado correctamente " ICON_MD_SENTIMENT_VERY_SATISFIED;
 				show_msg = true;
 				timeout_result = TimerC::fn(3500, []() -> int {
 					// Es funcion Lamnda no hace nada solo retorna cero
@@ -191,6 +229,30 @@ namespace SingleDoc {
 		if (ImGui::Button(ICON_MD_CLEAR_ALL, ImVec2(30.0f, 30.0f))) {
 			reset();
 		}
+
+		// Solo mostramos Boton Eliminar si estamos editando
+		if (id != NULL) {
+			ImGui::SameLine();
+			if (ImGui::Button(ICON_MD_DELETE, ImVec2(30.0f, 30.0f))) {
+				// Pasamos en otro Hilo para no pegar el hilo de la renderizacion del la GUI
+				delete_promise = std::async(std::launch::async, delete_document);
+			}
+		}
+		// Listener delete
+		if (delete_promise._Is_ready()) {
+			// Si es true tuvimos exito
+			if (delete_promise.get()) {
+				// Mostramos Mensaje
+				show_msg = true;
+				feedback_msg = "Documento eliminado correctamente " ICON_MD_MOOD;
+				timeout_result = TimerC::fn(3500, []() -> int {
+					// Es funcion Lamnda no hace nada solo retorna cero
+					// cuando se cumple el timeout
+					return 0;
+					});
+			}
+		}
+
 		ImGui::PopStyleVar();
 		// Crea espacio en Blanco y linea separadora
 		ImGui::Spacing();

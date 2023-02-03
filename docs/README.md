@@ -4,9 +4,7 @@ Para saber como instalar ImGUi desde cero revisar el video https://www.youtube.c
 Como nota, la clave esta en copiar los cpp y los .h a la carpeta includes y agregarlas al proyecto
 para que el IDE sepa que los tiene que buscar.
 
-Por compatiblidad con versiones, por defecto visual studio esta usando C++14, asi que nos ajustamos
-a esa especificacion, en el futuro se podria cambiar la version a algo mas nuevo. Verificando por
-supuesto que ImGUI sea compatible
+Projecto esta usando C++20
 
 El proyecto inicio usando DirectX12 como el backend, luego de enterarse backend que eran compatibles
 para Windows y para Linux se cambio a usar Vulkan. Se espera en algun momento saber como se podria
@@ -20,6 +18,11 @@ de nuevo al proyecto. NOTA, los archivos estan el la carpeta pero se quitaron de
 
 Para los iconos estamos usando MAterial Design Icons de Google. Se cargo el Header y se carga el file. Segun
 se explica aqui https://github.com/juliettef/IconFontCppHeaders desde donde se sacaron los .h
+
+Eliminar consola el Prod
+It sounds like your linker configuration is incorrect. Right-click the project, Properties, Linker, System, SubSystem setting. Make sure "Windows" is selected, not "Console".
+And, change main() to WinMain().
+
 
 NOTA
 
