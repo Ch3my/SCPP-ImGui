@@ -73,7 +73,7 @@ namespace SingleDoc {
 		args["sessionHash"] = AppState::sessionHash;
 
 		Json::Value api_result = ApiHelper::fn(AppState::apiPrefix + "/documentos", args, "GET");
-		std::cout << api_result;
+
 		// Deberia venir solo 1 resultado
 		if (api_result.isArray()) {
 			id = api_result[0]["id"].asInt();

@@ -37,6 +37,18 @@
     <Filter Include="Archivos de encabezado\helpers">
       <UniqueIdentifier>{a8e33633-2ed9-4921-ba8b-a038796b10d2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de origen\graph">
+      <UniqueIdentifier>{5326e2f4-bdf1-483d-91d0-243fdd875f1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\implot">
+      <UniqueIdentifier>{c1cc8d95-b0e4-4c1d-aa1c-4f3d84d6bb0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\implot">
+      <UniqueIdentifier>{782bf78d-f3a9-40ea-9a1a-9c87f5d524c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de encabezado\graph">
+      <UniqueIdentifier>{cdb63f82-ebae-4ece-afdb-71af06b7ee1c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -106,6 +118,21 @@
       <Filter>Archivos de origen\documentos</Filter>
     </ClCompile>
     <ClCompile Include="src\helpers\Utilities.cpp">
+      <Filter>Archivos de origen\helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graph\CategoryGraph.cpp">
+      <Filter>Archivos de origen\graph</Filter>
+    </ClCompile>
+    <ClCompile Include="include\implot\implot_items.cpp">
+      <Filter>Archivos de origen\implot</Filter>
+    </ClCompile>
+    <ClCompile Include="include\implot\implot.cpp">
+      <Filter>Archivos de origen\implot</Filter>
+    </ClCompile>
+    <ClCompile Include="include\implot\implot_demo.cpp">
+      <Filter>Archivos de origen\implot</Filter>
+    </ClCompile>
+    <ClCompile Include="src\helpers\TimerC.cpp">
       <Filter>Archivos de origen\helpers</Filter>
     </ClCompile>
   </ItemGroup>
@@ -256,6 +283,15 @@
     </ClInclude>
     <ClInclude Include="src\helpers\TimerC.h">
       <Filter>Archivos de encabezado\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\implot\implot_internal.h">
+      <Filter>Archivos de encabezado\implot</Filter>
+    </ClInclude>
+    <ClInclude Include="include\implot\implot.h">
+      <Filter>Archivos de encabezado\implot</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graph\CategoryGraph.h">
+      <Filter>Archivos de encabezado\graph</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

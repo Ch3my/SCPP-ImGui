@@ -26,6 +26,7 @@
 #include "src/helpers/IconsMaterialDesign.h"
 #include <string>
 #include <iostream>
+#include <implot/implot.h>
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
 // To link with VS2010-era libraries, VS2015+ requires linking with legacy_stdio_definitions.lib, which we do using this pragma.
@@ -397,6 +398,10 @@ int main(int, char**)
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    
+    // ==== IMPLOT ====
+    ImPlot::CreateContext();
+
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
@@ -453,7 +458,7 @@ int main(int, char**)
     //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
     //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
     //IM_ASSERT(font != NULL);
-
+ 
     // ==== ICON FONT APP ====
     // Carga la fuente de Material Design de Google
     static const ImWchar icons_ranges[] = { ICON_MIN_MD, ICON_MAX_16_MD, 0 };
@@ -539,6 +544,7 @@ int main(int, char**)
         // ==== DEBUG/DEV ====
         ImGui::ShowMetricsWindow();
         ImGui::ShowDemoWindow();
+        ImPlot::ShowDemoWindow();
 
         // ==== APP ====
         // Llamamos al router, que se encarga de renderizar lo que cooresponda
@@ -576,6 +582,8 @@ int main(int, char**)
     check_vk_result(err);
     ImGui_ImplVulkan_Shutdown();
     ImGui_ImplGlfw_Shutdown();
+
+    ImPlot::DestroyContext();
     ImGui::DestroyContext();
 
     CleanupVulkanWindow();

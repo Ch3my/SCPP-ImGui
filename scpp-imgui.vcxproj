@@ -156,15 +156,20 @@
     <ClCompile Include="include\imgui\imgui_stdlib.cpp" />
     <ClCompile Include="include\imgui\imgui_tables.cpp" />
     <ClCompile Include="include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="include\implot\implot.cpp" />
+    <ClCompile Include="include\implot\implot_demo.cpp" />
+    <ClCompile Include="include\implot\implot_items.cpp" />
     <ClCompile Include="Router.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\documentos\CategoriaPicker.cpp" />
     <ClCompile Include="src\documentos\documentos.cpp" />
     <ClCompile Include="src\documentos\SingleDoc.cpp" />
     <ClCompile Include="src\documentos\TipoDocPicker.cpp" />
+    <ClCompile Include="src\graph\CategoryGraph.cpp" />
     <ClCompile Include="src\helpers\ApiHelper.cpp" />
     <ClCompile Include="src\helpers\FormatNumber.cpp" />
     <ClCompile Include="src\helpers\imguidatechooser.cpp" />
+    <ClCompile Include="src\helpers\TimerC.cpp" />
     <ClCompile Include="src\helpers\Utilities.cpp" />
     <ClCompile Include="src\jsoncpp\jsoncpp.cpp" />
     <ClCompile Include="src\login\Login.cpp" />
@@ -194,6 +199,8 @@
     <ClInclude Include="include\imgui\imstb_rectpack.h" />
     <ClInclude Include="include\imgui\imstb_textedit.h" />
     <ClInclude Include="include\imgui\imstb_truetype.h" />
+    <ClInclude Include="include\implot\implot.h" />
+    <ClInclude Include="include\implot\implot_internal.h" />
     <ClInclude Include="include\json\allocator.h" />
     <ClInclude Include="include\json\assertions.h" />
     <ClInclude Include="include\json\config.h" />
@@ -212,6 +219,7 @@
     <ClInclude Include="src\documentos\documentos.h" />
     <ClInclude Include="src\documentos\SingleDoc.h" />
     <ClInclude Include="src\documentos\TipoDocPicker.h" />
+    <ClInclude Include="src\graph\CategoryGraph.h" />
     <ClInclude Include="src\helpers\ApiHelper.h" />
     <ClInclude Include="src\helpers\FormatNumber.h" />
     <ClInclude Include="src\helpers\IconsMaterialDesign.h" />
