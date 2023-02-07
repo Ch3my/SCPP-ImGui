@@ -465,6 +465,10 @@ int main(int, char**)
     ImFontConfig icons_config; icons_config.MergeMode = true; icons_config.PixelSnapH = true;
     io.Fonts->AddFontFromFileTTF("assets/" FONT_ICON_FILE_NAME_MD, 22.0f, &icons_config, icons_ranges);
 
+    // Cargamos fuente mas pequeña para donde necesitemos, Tenemos que hacerlo despues de
+    // los iconos porque los iconos se funden con la fuente principal
+    io.Fonts->AddFontFromFileTTF("assets/Roboto-Medium.ttf", 16.0f);
+
     // Upload Fonts
     {
         // Use any command queue
