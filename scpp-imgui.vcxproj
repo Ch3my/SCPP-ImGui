@@ -166,6 +166,7 @@
     <ClCompile Include="src\documentos\SingleDoc.cpp" />
     <ClCompile Include="src\documentos\TipoDocPicker.cpp" />
     <ClCompile Include="src\graph\CategoryGraph.cpp" />
+    <ClCompile Include="src\graph\TimeGraph.cpp" />
     <ClCompile Include="src\helpers\ApiHelper.cpp" />
     <ClCompile Include="src\helpers\FormatNumber.cpp" />
     <ClCompile Include="src\helpers\imguidatechooser.cpp" />
@@ -220,6 +221,7 @@
     <ClInclude Include="src\documentos\SingleDoc.h" />
     <ClInclude Include="src\documentos\TipoDocPicker.h" />
     <ClInclude Include="src\graph\CategoryGraph.h" />
+    <ClInclude Include="src\graph\TimeGraph.h" />
     <ClInclude Include="src\helpers\ApiHelper.h" />
     <ClInclude Include="src\helpers\FormatNumber.h" />
     <ClInclude Include="src\helpers\IconsMaterialDesign.h" />

@@ -577,9 +577,10 @@ int main(int, char**)
             FramePresent(wd);
     }
 
+    // ==== OnDestroy ====
     // Si se sale del Loop significa que presionaron la X para cerrar la aplicacion
-    // aqui podemos llamar a alguna funcion que guarde el estado antes de salir si fuera necesario
-    std::cout << "On Destroy";
+    // Llamamos funcion que guarda el estado de variables que queremos recuperar al inciar la prox vez
+    AppState::save_state_to_file();
 
     // Cleanup
     err = vkDeviceWaitIdle(g_Device);

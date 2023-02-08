@@ -12,6 +12,8 @@ namespace AppState
 	std::string apiPrefix = "";
 	bool showConfig = false;
 	bool showSingleDoc = false;
+	bool showBarGraph = false;
+	bool showLineGraph = false;
 
 	void create_localstorage_file() {
 		// Crea el archivo y le pone datos vacios. Sera la primera vez que abren la App
@@ -44,6 +46,8 @@ namespace AppState
 		Json::Value data;
 		data["sessionHash"] = sessionHash;
 		data["apiPrefix"] = apiPrefix;
+		data["showBarGraph"] = showBarGraph;
+		data["showLineGraph"] = showLineGraph;
 
 		std::string str_data = ApiHelper::json_to_string(data);
 
@@ -74,5 +78,7 @@ namespace AppState
 		// Cargamos datos al estado
 		apiPrefix = data["apiPrefix"].asString();
 		sessionHash = data["sessionHash"].asString();
+		showBarGraph= data["showBarGraph"].asBool();
+		showLineGraph = data["showLineGraph"].asBool();
 	}
 }

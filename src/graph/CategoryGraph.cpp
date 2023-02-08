@@ -22,9 +22,14 @@
 namespace CategoryGraph {
 
 	static std::vector<int> bar_data;
+	static std::vector<std::string> formatted_bar_data;
 	static std::vector<std::string> bar_labels;
 	static bool show_window = true;
+	static bool mounted = false;
 	static ImVec4 color = ImVec4(0.323f, 0.819f, 0.319f, 1.0f);
+	float CELL_PADDING_V = 3.0f;
+	ImVec2 cell_padding(CELL_PADDING_V, CELL_PADDING_V);
+	ImGuiTableFlags table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_PadOuterX;
 
 	// TODO. Interface
 	void before_render() {
@@ -47,10 +52,13 @@ namespace CategoryGraph {
 		for (unsigned int i = 0; i < api_result["data"].size(); ++i) {
 			const auto& object = api_result["data"][i];
 			bar_data.push_back(object["data"].asInt());
-			if (object["label"].asString().size() > 6) {
+			formatted_bar_data.push_back(FormatNumber::format(object["data"].asInt(), NULL, NULL));
+
+			// LABELS
+			if (object["label"].asString().size() > 5) {
 				// Limita el largo de la palabra
 				// lo ideal es rotar las labels pero parece que no se puede
-				bar_labels.push_back(object["label"].asString().substr(0, 6));
+				bar_labels.push_back(object["label"].asString().substr(0, 5));
 				continue;
 			}
 			bar_labels.push_back(object["label"].asString());
@@ -65,7 +73,16 @@ namespace CategoryGraph {
 
 	// TODO. Interface
 	void render() {
-		if (bar_data.empty()) {
+		if (!show_window) {
+			AppState::showBarGraph = false;
+			mounted = false;
+			show_window = true;
+		}
+
+		// Llenamos datos si la lista esta vacia y aun no estamos mounted
+		// sino estariamos llamando continuamente si por alguna razon
+		// la lista viene vacia desde la API
+		if (bar_data.empty() && !mounted) {
 			get_data();
 		}
 		// Los datos y las labels deberian tener siempre el mismo size()
@@ -76,9 +93,9 @@ namespace CategoryGraph {
 		// pasamos a imPLot y funciona!!
 		int* bar_data_ptr = bar_data.data();
 
-		ImGui::SetNextWindowSize(ImVec2(650.0f, 400.0f));
-		// show_window solo esta para llenar el espacio, no se puede cerrar esta ventana
-		// TODO ver si sera necesario cerrar esta ventana. Si se cierra hay que crear manera de abrirla de nuevo
+		ImGui::SetNextWindowSize(ImVec2(700.0f, 400.0f));
+		ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, cell_padding);
+
 		ImGui::Begin("Gastos por Categoria Anual", &show_window, ImGuiWindowFlags_NoResize);
 
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 1.4f));
@@ -94,11 +111,17 @@ namespace CategoryGraph {
 		ImFontAtlas* atlas = g.IO.Fonts;
 		ImGui::PushFont(atlas->Fonts[1]);
 
-		// ImPlotFlags_NoMouseText no muestra coordenadas del Mouse cuando pasea
+		// ImPlotFlags_NoMouseText no muestra coordenadas del Mouse cuando pasea		
+		// ImPlotFlags_NoTitle no muestra el titulo porque la ventana ya tiene titulo
+		// Definimos el largo del plot para poder tener espacio para tabla al costado
+		if (ImPlot::BeginPlot("Gastos por Categoria Anual", 
+			ImVec2(ImGui::GetContentRegionAvail().x / 1.25f, -1),
+			ImPlotFlags_NoMouseText | ImPlotFlags_NoTitle)) {
 
-		if (ImPlot::BeginPlot("Gastos por Categoria Anual", ImVec2(-1, -1), ImPlotFlags_NoMouseText)) {
 			ImPlot::SetupAxis(ImAxis_X1, "Categoria");
 			ImPlot::SetupAxis(ImAxis_Y1, "Monto");
+			// Posicion del cuadro descriptivo o legenda
+			ImPlot::SetupLegend(ImPlotLocation_NorthEast);
 			// Pone el limite de Y Axis 10% mayor que el valor mas alto del dataset
 			ImPlot::SetupAxisLimits(ImAxis_Y1, 0, *std::max_element(bar_data.begin(), bar_data.end()) * 1.1);
 
@@ -142,7 +165,35 @@ namespace CategoryGraph {
 			delete[] positions;
 		}
 		ImGui::PopFont();
+		ImGui::SameLine();
+
+		// ==== Tabla de Datos ====
+		if (ImGui::BeginTable("docs", 2, table_flags)) {
+			// Crea la tabla y configura las columnas, hay mas flags que se podrian aplicar
+			ImGui::TableSetupColumn("Cat");
+			ImGui::TableSetupColumn("Monto");
+			ImGui::TableHeadersRow();
+			for (Json::Value::ArrayIndex i = 0; i != formatted_bar_data.size(); i++) {
+				ImGui::TableNextRow();
+				ImGui::TableSetColumnIndex(0);
+				ImGui::Text(bar_labels[i].c_str());
+				ImGui::TableSetColumnIndex(1);
+				// Hack Alinear texto a la derecha
+				float textWidth = ImGui::CalcTextSize(formatted_bar_data[i].c_str()).x;
+				ImGui::Dummy(ImVec2(ImGui::GetColumnWidth() - textWidth - CELL_PADDING_V*2, 0.0f));
+				ImGui::SameLine();
+				ImGui::Text(formatted_bar_data[i].c_str());
+			}
+			ImGui::EndTable();
+		}
 
 		ImGui::End();
+		ImGui::PopStyleVar();
+
+		// AL final de la primera renderizacion seteamos mounted a true para avisar que se hicieron
+		// todas las operaciones correspondientes y/o llamar otras operaciones
+		if (!mounted) {
+			mounted = true;
+		}
 	}
 }

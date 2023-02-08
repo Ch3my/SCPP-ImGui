@@ -135,6 +135,9 @@
     <ClCompile Include="src\helpers\TimerC.cpp">
       <Filter>Archivos de origen\helpers</Filter>
     </ClCompile>
+    <ClCompile Include="src\graph\TimeGraph.cpp">
+      <Filter>Archivos de origen\graph</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\imgui\imstb_rectpack.h">
@@ -291,6 +294,9 @@
       <Filter>Archivos de encabezado\implot</Filter>
     </ClInclude>
     <ClInclude Include="src\graph\CategoryGraph.h">
+      <Filter>Archivos de encabezado\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graph\TimeGraph.h">
       <Filter>Archivos de encabezado\graph</Filter>
     </ClInclude>
   </ItemGroup>

@@ -37,6 +37,7 @@ namespace Documentos {
 			reload_docs();
 			mounted = true;
 		}
+
 		// Estas variables se pierden entre renderizaciones pero como son flags nomas
 		// en teoria no hace diferencia, de usarse se usan durante el mismo ciclo que se definieron
 		// asi podemos liberar memoria ?
@@ -46,9 +47,31 @@ namespace Documentos {
 		ImVec2 cell_padding(CELL_PADDING_V, CELL_PADDING_V);
 		ImGuiTableFlags table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_PadOuterX;
 
-		// Aplica un stilo a la ventana, importante llamar antes del Begin
+		// Aplica un stilo a la ventana
 		ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, cell_padding);
-		ImGui::Begin("Documentos");
+		// Es necesario setear la flag en la ventana para que muestre el menu
+		// sino no lo muestra
+		ImGui::Begin("Documentos", nullptr, ImGuiWindowFlags_MenuBar);
+
+		// Esta pantalla se convirtio en la pantalla principal. Tiene menu para controlar otras opciones
+		// como si se muestran o no los graficos
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("Menu"))
+			{
+				if (ImGui::MenuItem("Show Bar Graph", NULL, AppState::showBarGraph)) {
+				// Si le hacen clic hacemos toggle de la variable que controla la ruta
+					AppState::showBarGraph = !AppState::showBarGraph;
+				}
+				if (ImGui::MenuItem("Show Line Graph", NULL, AppState::showLineGraph)) {
+					// Si le hacen clic hacemos toggle de la variable que controla la ruta
+					AppState::showLineGraph = !AppState::showLineGraph;
+				}
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenuBar();
+		}
+
 
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 1.4f));
 		if (ImGui::Button(ICON_MD_REFRESH, ImVec2(30.0f, 30.0f))) {
@@ -141,7 +164,7 @@ namespace Documentos {
 
 		}
 		ImGui::End();
-		// Limpia un stilo a la ventana, importante llamar despues del END
+		// Limpia un stilo a la ventana
 		ImGui::PopStyleVar();
 	}
 

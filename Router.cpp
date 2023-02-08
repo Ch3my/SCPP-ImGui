@@ -8,7 +8,8 @@
 #include "src/documentos/documentos.h"
 #include "src/Config.h"
 #include "src/documentos/SingleDoc.h"
-#include "src/graph/CategoryGraph.h";
+#include "src/graph/CategoryGraph.h"
+#include "src/graph/TimeGraph.h"
 
 namespace Router
 {
@@ -24,8 +25,6 @@ namespace Router
 		}
 		else if (AppState::route == "/documentos") {
 			Documentos::render();
-			// Si estamos en documentos siempre queremos mostrar el Grafico?
-			CategoryGraph::render();
 		}
 		else {
 			ImGui::Begin("Default Window");
@@ -42,6 +41,12 @@ namespace Router
 		}
 		if (AppState::showSingleDoc) {
 			SingleDoc::render();
+		}
+		if (AppState::showBarGraph) {
+			CategoryGraph::render();
+		}
+		if (AppState::showLineGraph) {
+			TimeGraph::render();
 		}
 
 	}
