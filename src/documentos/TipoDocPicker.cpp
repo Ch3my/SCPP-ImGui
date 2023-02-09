@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <future>
 
 namespace TipoDocPicker {
 
@@ -14,6 +15,8 @@ namespace TipoDocPicker {
 	// Deberia ser mejor performance
 	static std::map<int, std::string> tipo_doc_list;
 	static ImGuiComboFlags flags = 0;
+	static bool mounted = false;
+	static std::future<void> promise;
 
 	void load_tipo_doc() {
 		ImGui::CheckboxFlags("ImGuiComboFlags_PopupAlignLeft", &flags, ImGuiComboFlags_PopupAlignLeft);
@@ -31,9 +34,13 @@ namespace TipoDocPicker {
 		}
 	}
 
+	void reload_data() {
+		promise = std::async(std::launch::async, load_tipo_doc);
+	}
+
 	void render(int& tipo_doc) {
-		if (tipo_doc_list.empty()) {
-			load_tipo_doc();
+		if (tipo_doc_list.empty() && !mounted) {
+			reload_data();
 		}
 
 		// En este caso siempre queremos partir con Gasto seleccionado
@@ -60,6 +67,11 @@ namespace TipoDocPicker {
 				}
 			}
 			ImGui::EndCombo();
+		}
+		// AL final de la primera renderizacion seteamos mounted a true para avisar que se hicieron
+		// todas las operaciones correspondientes y/o llamar otras operaciones
+		if (!mounted) {
+			mounted = true;
 		}
 	}
 
@@ -93,6 +105,11 @@ namespace TipoDocPicker {
 				}
 			}
 			ImGui::EndCombo();
+		}
+		// AL final de la primera renderizacion seteamos mounted a true para avisar que se hicieron
+		// todas las operaciones correspondientes y/o llamar otras operaciones
+		if (!mounted) {
+			mounted = true;
 		}
 	}
 }

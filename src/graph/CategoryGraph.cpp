@@ -18,6 +18,8 @@
 #include <chrono>
 #include <future>
 #include <vector>
+#include <mutex>
+#include <atomic>
 
 namespace CategoryGraph {
 
@@ -26,6 +28,10 @@ namespace CategoryGraph {
 	static std::vector<std::string> bar_labels;
 	static bool show_window = true;
 	static bool mounted = false;
+	static std::future<void> promise;
+	// Atomic en realidad no es necesario
+	static std::atomic<bool> refreshing_data = false;
+
 	static ImVec4 color = ImVec4(0.323f, 0.819f, 0.319f, 1.0f);
 	float CELL_PADDING_V = 3.0f;
 	ImVec2 cell_padding(CELL_PADDING_V, CELL_PADDING_V);
@@ -41,10 +47,17 @@ namespace CategoryGraph {
 	}
 
 	void get_data() {
+
 		Json::Value args;
 		args["sessionHash"] = AppState::sessionHash;
 
 		Json::Value api_result = ApiHelper::fn(AppState::apiPrefix + "/expenses-by-category", args, "GET");
+
+		refreshing_data = true;
+		// Reseteamos variables
+		bar_data.clear();
+		bar_labels.clear();
+		formatted_bar_data.clear();
 
 		// La api entrega varios objetos, recorremos el objeto consolidado y asignamos 
 		// variables donde corresponda en un solo loop
@@ -63,12 +76,28 @@ namespace CategoryGraph {
 			}
 			bar_labels.push_back(object["label"].asString());
 		}
+		refreshing_data = false;
 	}
 
 	int YAxisFormatter(double value, char* buff, int size, void* data) {
 		// Sacado de implot_Demo funcion MetricFormatter. Usar FormatNumber no afecta la
 		// performance asi que usamos nomas
 		return snprintf(buff, size, "%s", FormatNumber::format(int(value), NULL, NULL).c_str());
+	}
+
+	// No es static para que la llamen de otros archivos
+	void reload_data() {
+		// Ejecuta Async, dentro de la funcion render se verifica si la promesa esta lista
+		// y carga si corresponde, esa funcion se ejecuta constantemente, si quisieramos hacer algo asi aqui
+		// tendriamos que hacer .get aqui mismo y entonces no seria multithread
+
+		// Usamos std::async para llamar a la funcion, Disponible desde C++11
+		// std::async con std::launch::async se asegura de ejecutar la funcion async, problablemente en otro thread
+		// std::async se encarga de crear el thread o de usar uno que ya exista
+		promise = std::async(std::launch::async, get_data);
+
+		// NOTA. sino se esta ejecutando render la promesa queda por ahi dando vueltas??
+		// porque no se llama a .get?
 	}
 
 	// TODO. Interface
@@ -83,7 +112,7 @@ namespace CategoryGraph {
 		// sino estariamos llamando continuamente si por alguna razon
 		// la lista viene vacia desde la API
 		if (bar_data.empty() && !mounted) {
-			get_data();
+			reload_data();
 		}
 		// Los datos y las labels deberian tener siempre el mismo size()
 		// uso size_t porque habia mensaje en VS funciona size_t/int sin diferencia
@@ -93,14 +122,14 @@ namespace CategoryGraph {
 		// pasamos a imPLot y funciona!!
 		int* bar_data_ptr = bar_data.data();
 
-		ImGui::SetNextWindowSize(ImVec2(700.0f, 400.0f));
+		ImGui::SetNextWindowSize(ImVec2(750.0f, 370.0f));
 		ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, cell_padding);
 
 		ImGui::Begin("Gastos por Categoria Anual", &show_window, ImGuiWindowFlags_NoResize);
 
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 1.4f));
 		if (ImGui::Button(ICON_MD_REFRESH, ImVec2(30.0f, 30.0f))) {
-			get_data();
+			reload_data();
 		}
 		ImGui::PopStyleVar();
 
@@ -114,7 +143,11 @@ namespace CategoryGraph {
 		// ImPlotFlags_NoMouseText no muestra coordenadas del Mouse cuando pasea		
 		// ImPlotFlags_NoTitle no muestra el titulo porque la ventana ya tiene titulo
 		// Definimos el largo del plot para poder tener espacio para tabla al costado
-		if (ImPlot::BeginPlot("Gastos por Categoria Anual", 
+
+		// Solo renderizamos si hay datos, sino nos salimos. Verificamos si hay datos primero
+		// si verificamos segundo el plot se alcanza a crear
+		if (!bar_data.empty() && !refreshing_data && 
+			ImPlot::BeginPlot("Gastos por Categoria Anual",
 			ImVec2(ImGui::GetContentRegionAvail().x / 1.25f, -1),
 			ImPlotFlags_NoMouseText | ImPlotFlags_NoTitle)) {
 
@@ -168,7 +201,7 @@ namespace CategoryGraph {
 		ImGui::SameLine();
 
 		// ==== Tabla de Datos ====
-		if (ImGui::BeginTable("docs", 2, table_flags)) {
+		if (!refreshing_data && ImGui::BeginTable("docs", 2, table_flags)) {
 			// Crea la tabla y configura las columnas, hay mas flags que se podrian aplicar
 			ImGui::TableSetupColumn("Cat");
 			ImGui::TableSetupColumn("Monto");
