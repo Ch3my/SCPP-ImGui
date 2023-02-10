@@ -31,6 +31,7 @@ namespace CategoryGraph {
 	static std::future<void> promise;
 	// Atomic en realidad no es necesario
 	static std::atomic<bool> refreshing_data = false;
+	const float initial_window_width = 750.0f;
 
 	static ImVec4 color = ImVec4(0.323f, 0.819f, 0.319f, 1.0f);
 	float CELL_PADDING_V = 3.0f;
@@ -122,10 +123,21 @@ namespace CategoryGraph {
 		// pasamos a imPLot y funciona!!
 		int* bar_data_ptr = bar_data.data();
 
-		ImGui::SetNextWindowSize(ImVec2(750.0f, 370.0f));
-		ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, cell_padding);
+		// Seteamos el size de la window solo la primera vez
+		ImGui::SetNextWindowSize(ImVec2(initial_window_width, 370.0f), ImGuiCond_Appearing);
 
-		ImGui::Begin("Gastos por Categoria Anual", &show_window, ImGuiWindowFlags_NoResize);
+		// Seteamos la ubicacion inicialmente. El usuario puede mover donde quiera despues
+		// La primera posicion se considera relativa al mainViewport. La ventana no es parte del
+		// mainViewport la podemos sacar luego si queremos o volver a poner
+		ImGui::SetNextWindowPos(
+			ImVec2(
+				ImGui::GetMainViewport()->Pos.x + ImGui::GetMainViewport()->Size.x - initial_window_width,
+				ImGui::GetMainViewport()->Pos.y + 0
+			)
+		,ImGuiCond_Appearing);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, cell_padding);
+		ImGui::Begin("Gastos por Categoria Anual", &show_window);
 
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 1.4f));
 		if (ImGui::Button(ICON_MD_REFRESH, ImVec2(30.0f, 30.0f))) {

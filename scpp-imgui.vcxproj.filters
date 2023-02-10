@@ -87,7 +87,7 @@
     <ClCompile Include="src\jsoncpp\jsoncpp.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
-    <ClCompile Include="src\documentos\documentos.cpp">
+    <ClCompile Include="src\documentos\Documentos.cpp">
       <Filter>Archivos de origen\documentos</Filter>
     </ClCompile>
     <ClCompile Include="src\helpers\ApiHelper.cpp">
@@ -242,7 +242,7 @@
     <ClInclude Include="include\json\assertions.h">
       <Filter>Archivos de encabezado\jsoncpp</Filter>
     </ClInclude>
-    <ClInclude Include="src\documentos\documentos.h">
+    <ClInclude Include="src\documentos\Documentos.h">
       <Filter>Archivos de encabezado\documentos</Filter>
     </ClInclude>
     <ClInclude Include="src\helpers\ApiHelper.h">

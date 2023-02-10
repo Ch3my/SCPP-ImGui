@@ -5,10 +5,12 @@
 #include "SingleDoc.h"
 #include "../helpers/IconsMaterialDesign.h"
 #include "TipoDocPicker.h"
+#include "CategoriaPicker.h"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_win32.h>
 #include <imgui/imgui_impl_dx12.h>
+#include "../helpers/imguidatechooser.h"
 
 #include <string>
 #include <iostream>
@@ -23,19 +25,36 @@ namespace Documentos {
 	// static para que no de error de linking por una variable del mismo nombre en otro archivo
 	// Aunque los namespaces nos ayudan a evitar eso tambien
 	static int fk_tipo_doc = 1; // 1 = Gasto, carga por defecto
+	static int fk_categoria = 0; // 0 = Todos
 	static std::future<Json::Value> promise;
+	static std::future<void> promise_single_doc;
 	static bool mounted = false;
+	const float initial_window_width = 450.0f;
+	const float initial_window_height = 700.0f;
 
 	static Json::Value docs;
+
+	static const char* dateFormat = "%d/%m/%Y";
+	static tm fecha_inicio = { 0 };
+	static tm fecha_termino = { 0 };
 
 	// Tenemos que declarar (dentro del namespace) para llamar antes de definir, o dar vuelta las funciones
 	Json::Value get_documentos();
 	void reload_docs();
+	void preload_single_doc(int id_doc);
+
+	void on_mounted() {
+		// Seteamos fechas a las fechas que correspondan de inicio. Sino de Datechoose las setea
+		// automaticamente a hoy al parecer
+		Utilities::SetTmFromTipoDoc(fecha_inicio, fecha_termino, fk_tipo_doc);
+		// Recargamos documentos
+		reload_docs();
+		mounted = true;
+	}
 
 	void render() {
 		if (!mounted) {
-			reload_docs();
-			mounted = true;
+			on_mounted();
 		}
 
 		// Estas variables se pierden entre renderizaciones pero como son flags nomas
@@ -43,9 +62,19 @@ namespace Documentos {
 		// asi podemos liberar memoria ?
 		bool selected_row = false;
 		bool tipo_doc_combo_changed = false;
+		bool categoria_combo_changed = false;
 		float CELL_PADDING_V = 7.0f;
 		ImVec2 cell_padding(CELL_PADDING_V, CELL_PADDING_V);
 		ImGuiTableFlags table_flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable | ImGuiTableFlags_PadOuterX;
+
+
+		ImGui::SetNextWindowSize(ImVec2(initial_window_width, initial_window_height), ImGuiCond_Appearing);
+		ImGui::SetNextWindowPos(
+			ImVec2(
+				ImGui::GetMainViewport()->Pos.x + 0,
+				ImGui::GetMainViewport()->Pos.y + 0
+			)
+			, ImGuiCond_Appearing);
 
 		// Aplica un stilo a la ventana
 		ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, cell_padding);
@@ -60,7 +89,7 @@ namespace Documentos {
 			if (ImGui::BeginMenu("Menu"))
 			{
 				if (ImGui::MenuItem("Show Bar Graph", NULL, AppState::showBarGraph)) {
-				// Si le hacen clic hacemos toggle de la variable que controla la ruta
+					// Si le hacen clic hacemos toggle de la variable que controla la ruta
 					AppState::showBarGraph = !AppState::showBarGraph;
 				}
 				if (ImGui::MenuItem("Show Line Graph", NULL, AppState::showLineGraph)) {
@@ -72,7 +101,12 @@ namespace Documentos {
 			ImGui::EndMenuBar();
 		}
 
-
+		// ____   _
+		// | _ \ | |
+		// ||_) || |_  _ __   ___
+		// | _ < | __|| '_ \ / __|
+		// | |_)|| |_ | | | |\__ \
+		// |____/ \__||_| |_||___/
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 1.4f));
 		if (ImGui::Button(ICON_MD_REFRESH, ImVec2(30.0f, 30.0f))) {
 			reload_docs();
@@ -87,10 +121,47 @@ namespace Documentos {
 			AppState::showSingleDoc = true;
 		}
 		ImGui::PopStyleVar();
-		ImGui::SameLine();
+
+		//	 ______  _  _  _
+		//	| ____ |(_)| || |
+		//	| |__    _ | || |_  ___   _ __  ___
+		//	| __|   | || || __|/ _ \ | '__|/ __|
+		//	| |     | || || |_ | __/ | |   \__ \
+		//	|_|     |_||_| \__|\___| |_|  |___ /
+		// Para que funcionen bonito tenemos que definirles su largo
+		// porque tienen un largo por defecto que no nos acomoda
+		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x / 2);
 		TipoDocPicker::render(fk_tipo_doc, tipo_doc_combo_changed);
+		if (fk_tipo_doc == 1) {
+			// Solo mostramos categorias si el tipo es gasto
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+			CategoriaPicker::render(fk_categoria, categoria_combo_changed);
+		}
+		ImGui::Text("Fecha Inicio");
+		ImGui::SameLine(120);
+		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+		if (ImGui::DateChooser("##fecha_inicio", fecha_inicio, dateFormat, false, NULL, NULL, NULL, NULL, NULL)) {
+			// Triggered on date change
+			reload_docs();
+		}
+		ImGui::Text("Fecha Termino");
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+		if (ImGui::DateChooser("##fecha_termino", fecha_termino, dateFormat, false, NULL, NULL, NULL, NULL, NULL)) {
+			// Triggered on date change
+			reload_docs();
+		}
+
 		ImGui::Spacing();
 		if (tipo_doc_combo_changed) {
+			// Si cambian el tipo de documento nos aseguramos de cambiar el rango de fecha
+			// segun corresponda
+			Utilities::SetTmFromTipoDoc(fecha_inicio, fecha_termino, fk_tipo_doc);
+			// Reseteamos la categoria. Ahorros y Ingresos no tienen y si la pasamos
+			// va a filtrar por algo que no tiene sentido
+			fk_categoria = 0;
+
 			// Si el flag indica que el combo cambio (true aun si seleccionan el mismo)
 			// llamamos a documentos en otro hilo, y otra pregunta revisa si el hilo devolvio
 			// y carga los documentos
@@ -98,6 +169,12 @@ namespace Documentos {
 			// Reseteamos Flag para que no se ejecute de nuevo este codigo
 			tipo_doc_combo_changed = false;
 		}
+
+		if (categoria_combo_changed) {
+			reload_docs();
+			categoria_combo_changed = false;
+		}
+
 		// Si la promesa esta ok usamos su resultado
 		if (promise._Is_ready()) {
 			// al llamar .get ya promesa deja de _Is_ready() asi no se 
@@ -131,7 +208,7 @@ namespace Documentos {
 				if (selected_row) {
 					// Seteamos documento en funcion que busca el documento
 					// y lo carga
-					SingleDoc::load_document(docs[i]["id"].asInt());
+					preload_single_doc(docs[i]["id"].asInt());
 					// ahora que ya deberia estar cargado marcamos para que se muestre la ventana
 					AppState::showSingleDoc = true;
 					selected_row = false;
@@ -170,19 +247,13 @@ namespace Documentos {
 
 	Json::Value get_documentos() {
 		Json::Value json_args;
-		json_args["fk_tipoDoc"] = fk_tipo_doc;
 		json_args["sessionHash"] = AppState::sessionHash;
-		if (fk_tipo_doc == 1) {
-			// Gasto ve mes Actual
-			std::vector<std::string> month_range = Utilities::GetCurrentMonthRange();
-			json_args["fechaInicio"] = month_range.at(0);
-			json_args["fechaTermino"] = month_range.at(1);
-		}
-		if (fk_tipo_doc == 2 || fk_tipo_doc == 3) {
-			// Otros ven todo el año actual
-			std::vector<std::string> year_range = Utilities::GetCurrentYearRange();
-			json_args["fechaInicio"] = year_range.at(0);
-			json_args["fechaTermino"] = year_range.at(1);
+		json_args["fk_tipoDoc"] = fk_tipo_doc;
+		json_args["fechaInicio"] = Utilities::FormatTm("%Y-%m-%d", fecha_inicio);
+		json_args["fechaTermino"] = Utilities::FormatTm("%Y-%m-%d", fecha_termino);
+		// 0 Significa todos. Ignoramos completamente si es cero
+		if (fk_categoria != 0) {
+			json_args["fk_categoria"] = fk_categoria;
 		}
 
 		Json::Value data = ApiHelper::fn(AppState::apiPrefix + "/documentos", json_args, "GET");
@@ -219,5 +290,9 @@ namespace Documentos {
 
 		// NOTA. sino se esta ejecutando render la promesa queda por ahi dando vueltas??
 		// porque no se llama a .get?
+	}
+
+	void preload_single_doc(int id_doc) {
+		promise_single_doc = std::async(std::launch::async, SingleDoc::load_document, id_doc);
 	}
 }

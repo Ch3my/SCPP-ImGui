@@ -27,6 +27,8 @@ namespace TimeGraph {
 	static std::future<void> promise;
 	// Atomic en realidad no es necesario
 	static std::atomic<bool> refreshing_data = false;
+	const float initial_window_width = 750.0f;
+	const float initial_window_height = 320.0f;
 
 	float CELL_PADDING_V = 3.0f;
 	ImVec2 cell_padding(CELL_PADDING_V, CELL_PADDING_V);
@@ -156,24 +158,31 @@ namespace TimeGraph {
 			reload_data();
 		}
 
-		ImGui::SetNextWindowSize(ImVec2(750.0f, 320.0f));
-		ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, cell_padding);
+		ImGui::SetNextWindowSize(ImVec2(initial_window_width, initial_window_height), ImGuiCond_Appearing);
+		ImGui::SetNextWindowPos(
+			ImVec2(
+				ImGui::GetMainViewport()->Pos.x + ImGui::GetMainViewport()->Size.x - initial_window_width,
+				ImGui::GetMainViewport()->Pos.y + ImGui::GetMainViewport()->Size.y - initial_window_height
+			)
+			, ImGuiCond_Appearing);
 
-		ImGui::Begin("Historico por Tipo Doc", &show_window, ImGuiWindowFlags_NoResize);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, cell_padding);
+		ImGui::Begin("Historico por Tipo Doc", &show_window);
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 1.4f));
 		if (ImGui::Button(ICON_MD_REFRESH, ImVec2(30.0f, 30.0f))) {
-			get_data();
+			reload_data();
 		}
 		ImGui::PopStyleVar();
 
 		// ImPlotFlags_NoMouseText no muestra coordenadas del Mouse cuando pasea		
 		// ImPlotFlags_NoTitle no muestra el titulo porque la ventana ya tiene titulo
 		// Definimos el largo del plot para poder tener espacio para tabla al costado
-		if (!refreshing_data && 
+		if (!refreshing_data &&
 			!x_axis_timestamps.empty() &&
 			ImPlot::BeginPlot("Gastos por Categoria Anual",
-			ImVec2(ImGui::GetContentRegionAvail().x * 0.55f, -1),
-			ImPlotFlags_NoMouseText | ImPlotFlags_NoTitle)) {
+				ImVec2(ImGui::GetContentRegionAvail().x * 0.55f, -1),
+				ImPlotFlags_NoMouseText | ImPlotFlags_NoTitle)) {
 			ImPlot::SetupAxis(ImAxis_Y1, "Monto");
 			ImPlot::SetupAxisScale(ImAxis_X1, ImPlotScale_Time);
 			// Define and use a custom formatter, formatea datos de Y

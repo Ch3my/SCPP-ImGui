@@ -4,8 +4,13 @@
 
 #include <string>
 #include <map>
+#include <mutex>
 
 namespace ApiHelper {
+
+	// Definimos el Mutex globalmente en el namespace. Si lo definimos
+	// dentro de la funcion se resetea cuando se define de nuevo y no cumple su funcion
+	static std::mutex lock;
 
 	int callback(void* response_string, size_t size, size_t nmemb, void* userp)
 	{
@@ -158,6 +163,11 @@ namespace ApiHelper {
 		Json::Value json_args,
 		std::string method)
 	{
+		// Ponemos Lock, evitamos que se mezclen las variables. Ya que la API
+		// se llama usando multithread. Si 2 thread ejecutan al mismo tiempo
+		// es posible que les resetee las variables al otro antes de que termine
+		std::lock_guard<std::mutex> lock_guard(lock);
+
 		std::string json_string;
 		Json::Value json_data;
 		Json::Reader json_reader;

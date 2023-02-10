@@ -82,10 +82,7 @@ namespace SingleDoc {
 			monto_text = FormatNumber::format(api_result[0]["monto"].asInt(), NULL, NULL);
 
 			std::vector<std::string> t = Utilities::SplitString(api_result[0]["fecha"].asString(), "-");
-			int year = std::stoi(t.at(0));
-			int month = std::stoi(t.at(1));
-			int day = std::stoi(t.at(2));
-			Utilities::SetTmDate(fecha, year, month, day);
+			Utilities::SetTmDate(fecha, std::stoi(t.at(0)), std::stoi(t.at(1)), std::stoi(t.at(2)));
 
 			// Carga tipoDoc y Categoria
 			fk_tipo_doc = api_result[0]["fk_tipoDoc"].asInt();
@@ -185,6 +182,13 @@ namespace SingleDoc {
 
 		// Setea el tamaño de la ventana
 		ImGui::SetNextWindowSize(ImVec2(350.0f, 300.0f));
+		ImGui::SetNextWindowPos(
+			ImVec2(
+				ImGui::GetMainViewport()->Pos.x + 50,
+				ImGui::GetMainViewport()->Pos.y + ImGui::GetMainViewport()->Size.y / 2
+			)
+			, ImGuiCond_Appearing);
+
 		ImGui::Begin(window_title.c_str(), &show_window, ImGuiWindowFlags_NoResize);
 
 		// SI flag indica mostramos mensaje y setemamos otro hilo con
@@ -216,7 +220,7 @@ namespace SingleDoc {
 				reset();
 				feedback_msg = "Documento grabado correctamente " ICON_MD_SENTIMENT_VERY_SATISFIED;
 				show_msg = true;
-				timeout_result = TimerC::fn(3500, []() -> int {
+				timeout_result = TimerC::fn(3000, []() -> int {
 					// Es funcion Lamnda no hace nada solo retorna cero
 					// cuando se cumple el timeout
 					// std::cout << "insidee timeout";
@@ -245,7 +249,7 @@ namespace SingleDoc {
 				// Mostramos Mensaje
 				show_msg = true;
 				feedback_msg = "Documento eliminado correctamente " ICON_MD_MOOD;
-				timeout_result = TimerC::fn(3500, []() -> int {
+				timeout_result = TimerC::fn(3000, []() -> int {
 					// Es funcion Lamnda no hace nada solo retorna cero
 					// cuando se cumple el timeout
 					return 0;

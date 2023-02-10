@@ -63,7 +63,7 @@ namespace Utilities {
 		return result;
 	}
 
-	void SetTmDate(tm& date, int& year, int& month, int& day) {
+	void SetTmDate(tm& date, const int& year, const int& month, const int& day) {
 		memset(&date, 0, sizeof(tm));     // Mandatory for emscripten. Please do not remove!
 		date.tm_isdst = -1;
 		date.tm_sec = 0;		//	 Seconds.	[0-60] (1 leap second)
@@ -131,5 +131,55 @@ namespace Utilities {
 		// Crea array que va a devolver
 		std::vector<std::string> result = { ss_inicio.str(), ss_fin.str() };
 		return result;
+	}
+
+	std::string FormatTm(const char* date_format, tm date) {
+		std::stringstream ss;
+		// Se uso put_time para poder especificar formato en runtime
+		ss << std::put_time(&date, date_format);
+		return ss.str();
+	}
+
+	void SetTmFromTipoDoc(tm& fecha_inicio, tm& fecha_termino, const int& fk_tipo_doc) {
+		// Setea las referencias que nos envian a las fechas que correspondan segun el tipo de Documento
+		const std::chrono::time_point now{ std::chrono::system_clock::now() };
+		const std::chrono::year_month_day ymd{ std::chrono::floor<std::chrono::days>(now) };
+
+		//Gastos
+		if (fk_tipo_doc == 1) {
+			const std::chrono::year_month_day inicio_mes{ ymd.year() / ymd.month() / 1 };
+			const std::chrono::year_month_day fin_mes{ ymd.year() / ymd.month() / std::chrono::last };
+
+			SetTmDate(fecha_inicio,
+				static_cast<int>(inicio_mes.year()),
+				static_cast<unsigned>(inicio_mes.month()),
+				static_cast<unsigned>(inicio_mes.day())
+			);
+
+			SetTmDate(fecha_termino,
+				static_cast<int>(fin_mes.year()),
+				static_cast<unsigned>(fin_mes.month()),
+				static_cast<unsigned>(fin_mes.day())
+			);
+		}
+
+		// Ahorros y Ingresos
+		if (fk_tipo_doc == 2 || fk_tipo_doc == 3) {
+			// El rango de fechas es el año completo
+			const std::chrono::year_month_day inicio_year{ ymd.year() / 1 / 1 };
+			const std::chrono::year_month_day fin_year{ ymd.year() / 12 / std::chrono::last };
+
+			SetTmDate(fecha_inicio, 
+				static_cast<int>(inicio_year.year()), 
+				static_cast<unsigned>(inicio_year.month()), 
+				static_cast<unsigned>(inicio_year.day())
+			);
+
+			SetTmDate(fecha_termino, 
+				static_cast<int>(fin_year.year()), 
+				static_cast<unsigned>(fin_year.month()), 
+				static_cast<unsigned>(fin_year.day())
+			);
+		}
 	}
 }

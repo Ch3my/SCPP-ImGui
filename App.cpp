@@ -548,7 +548,7 @@ int main(int, char**)
         // ==== DEBUG/DEV ====
         ImGui::ShowMetricsWindow();
         ImGui::ShowDemoWindow();
-        ImPlot::ShowDemoWindow();
+        // ImPlot::ShowDemoWindow();
 
         // ==== APP ====
         // Llamamos al router, que se encarga de renderizar lo que cooresponda

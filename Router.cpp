@@ -5,7 +5,7 @@
 #include <imgui/imgui_impl_dx12.h>
 
 #include "src/login/Login.h"
-#include "src/documentos/documentos.h"
+#include "src/documentos/Documentos.h"
 #include "src/Config.h"
 #include "src/documentos/SingleDoc.h"
 #include "src/graph/CategoryGraph.h"
