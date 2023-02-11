@@ -11,6 +11,7 @@
 #include <imgui/imgui_impl_win32.h>
 #include <imgui/imgui_impl_dx12.h>
 #include "../helpers/imguidatechooser.h"
+#include <implot/implot.h>
 
 #include <string>
 #include <iostream>
@@ -30,9 +31,13 @@ namespace Documentos {
 	static std::future<void> promise_single_doc;
 	static bool mounted = false;
 	const float initial_window_width = 450.0f;
-	const float initial_window_height = 700.0f;
+	const float initial_window_height = 680.0f;
+	static bool show_debugger = false;
+	static bool show_imgui_demo = false;
+	static bool show_implot_demo = false;
 
 	static Json::Value docs;
+	static std::atomic<int> sum_docs = 0;
 
 	static const char* dateFormat = "%d/%m/%Y";
 	static tm fecha_inicio = { 0 };
@@ -52,11 +57,28 @@ namespace Documentos {
 		mounted = true;
 	}
 
+	void reset() {
+		fk_tipo_doc = 1;
+		fk_categoria = 0;
+		sum_docs = 0;
+		Utilities::SetTmFromTipoDoc(fecha_inicio, fecha_termino, fk_tipo_doc);
+		reload_docs();
+	}
+
 	void render() {
 		if (!mounted) {
 			on_mounted();
 		}
-
+		if (show_debugger) {
+			ImGui::ShowMetricsWindow();
+		}
+		if (show_imgui_demo) {
+			ImGui::ShowDemoWindow();
+		}
+		if (show_implot_demo) {
+			ImPlot::ShowDemoWindow();
+		}
+		
 		// Estas variables se pierden entre renderizaciones pero como son flags nomas
 		// en teoria no hace diferencia, de usarse se usan durante el mismo ciclo que se definieron
 		// asi podemos liberar memoria ?
@@ -96,6 +118,15 @@ namespace Documentos {
 					// Si le hacen clic hacemos toggle de la variable que controla la ruta
 					AppState::showLineGraph = !AppState::showLineGraph;
 				}
+				if (ImGui::MenuItem("Show Debugger", NULL, show_debugger)) {
+					show_debugger = !show_debugger;
+				}
+				if (ImGui::MenuItem("Show ImGui Demo", NULL, show_imgui_demo)) {
+					show_imgui_demo = !show_imgui_demo;
+				}
+				if (ImGui::MenuItem("Show ImPlot Demo", NULL, show_implot_demo)) {
+					show_implot_demo = !show_implot_demo;
+				}
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenuBar();
@@ -113,7 +144,7 @@ namespace Documentos {
 		}
 		ImGui::SameLine();
 		if (ImGui::Button(ICON_MD_CLEAR_ALL, ImVec2(30.0f, 30.0f))) {
-			docs.clear();
+			reset();
 		}
 		ImGui::SameLine();
 		if (ImGui::Button(ICON_MD_ADD_CIRCLE, ImVec2(30.0f, 30.0f))) {
@@ -240,6 +271,11 @@ namespace Documentos {
 			}
 
 		}
+
+		std::string total_text = "Total $ " + FormatNumber::format(sum_docs, NULL, NULL);
+		ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(total_text.c_str()).x - CELL_PADDING_V);
+		ImGui::Text(total_text.c_str());
+
 		ImGui::End();
 		// Limpia un stilo a la ventana
 		ImGui::PopStyleVar();
@@ -273,6 +309,7 @@ namespace Documentos {
 		for (Json::Value::ArrayIndex i = 0; i != data.size(); i++) {
 			std::string formattedNumber = FormatNumber::format(data[i]["monto"].asInt(), NULL, NULL);
 			data[i]["montoFormatted"] = formattedNumber;
+			sum_docs += data[i]["monto"].asInt();
 		}
 		return data;
 	}

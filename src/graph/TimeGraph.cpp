@@ -23,7 +23,7 @@ namespace TimeGraph {
 	static std::vector<double> gastos_line;
 	static std::vector<double> ahorros_line;
 	static std::vector<double> ingresos_line;
-	static const int meses_consulta = 7;
+	static const int meses_consulta = 9;
 	static std::future<void> promise;
 	// Atomic en realidad no es necesario
 	static std::atomic<bool> refreshing_data = false;
@@ -159,10 +159,11 @@ namespace TimeGraph {
 		}
 
 		ImGui::SetNextWindowSize(ImVec2(initial_window_width, initial_window_height), ImGuiCond_Appearing);
+		// -10 para que no este pegada al limite abajo
 		ImGui::SetNextWindowPos(
 			ImVec2(
 				ImGui::GetMainViewport()->Pos.x + ImGui::GetMainViewport()->Size.x - initial_window_width,
-				ImGui::GetMainViewport()->Pos.y + ImGui::GetMainViewport()->Size.y - initial_window_height
+				ImGui::GetMainViewport()->Pos.y + ImGui::GetMainViewport()->Size.y - initial_window_height - 10
 			)
 			, ImGuiCond_Appearing);
 

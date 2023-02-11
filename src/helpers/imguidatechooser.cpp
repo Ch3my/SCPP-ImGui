@@ -246,8 +246,8 @@ namespace ImGui {
         ImGui::SameLine();
         if (ImGui::SmallButton(arrowRight)) { d.tm_mon += 1; RecalculateDateDependentFields(d); }
         ImGui::PopID();
-
-        ImGui::SameLine(ImGui::GetWindowWidth() - yearPartWidth - ImGui::GetStyle().WindowPadding.x - ImGui::GetStyle().ItemSpacing.x * 4.f);
+        // CHEMY. Modificamos 4.f a 7.f para que la flecha derecha no nos quede fuera
+        ImGui::SameLine(ImGui::GetWindowWidth() - yearPartWidth - ImGui::GetStyle().WindowPadding.x - ImGui::GetStyle().ItemSpacing.x * 7.f);
 
         ImGui::PushID(1235);
         if (ImGui::SmallButton(arrowLeft)) { d.tm_year -= 1; if (d.tm_year < 0) d.tm_year = 0; RecalculateDateDependentFields(d); }

@@ -372,7 +372,7 @@ int main(int, char**)
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     // Crea ventana con tamaño y titulo personalizado
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "SCPP", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1220, 690, "SCPP - ImGui", NULL, NULL);
 
     // Setup Vulkan
     if (!glfwVulkanSupported())
@@ -401,6 +401,7 @@ int main(int, char**)
     
     // ==== IMPLOT ====
     ImPlot::CreateContext();
+    ImPlot::StyleColorsClassic();
 
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
@@ -544,11 +545,6 @@ int main(int, char**)
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-
-        // ==== DEBUG/DEV ====
-        ImGui::ShowMetricsWindow();
-        ImGui::ShowDemoWindow();
-        // ImPlot::ShowDemoWindow();
 
         // ==== APP ====
         // Llamamos al router, que se encarga de renderizar lo que cooresponda

@@ -124,7 +124,7 @@ namespace CategoryGraph {
 		int* bar_data_ptr = bar_data.data();
 
 		// Seteamos el size de la window solo la primera vez
-		ImGui::SetNextWindowSize(ImVec2(initial_window_width, 370.0f), ImGuiCond_Appearing);
+		ImGui::SetNextWindowSize(ImVec2(initial_window_width, 360.0f), ImGuiCond_Appearing);
 
 		// Seteamos la ubicacion inicialmente. El usuario puede mover donde quiera despues
 		// La primera posicion se considera relativa al mainViewport. La ventana no es parte del

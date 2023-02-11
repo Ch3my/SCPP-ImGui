@@ -42,10 +42,10 @@ namespace Router
 		if (AppState::showSingleDoc) {
 			SingleDoc::render();
 		}
-		if (AppState::showBarGraph) {
+		if (AppState::route == "/documentos" && AppState::showBarGraph) {
 			CategoryGraph::render();
 		}
-		if (AppState::showLineGraph) {
+		if (AppState::route == "/documentos" && AppState::showLineGraph) {
 			TimeGraph::render();
 		}
 

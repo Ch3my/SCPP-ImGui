@@ -11,6 +11,8 @@
 #include "../helpers/IconsMaterialDesign.h"
 #include "../helpers/TimerC.h"
 #include "documentos.h"
+#include "../graph/CategoryGraph.h"
+#include "../graph/TimeGraph.h"
 
 #include <json/json.h>
 
@@ -62,6 +64,12 @@ namespace SingleDoc {
 		if (id == NULL) {
 			result = save_document(false);
 		}
+
+		if (result) {
+			TimeGraph::reload_data();
+			CategoryGraph::reload_data();
+		}
+
 		return result;
 	}
 
@@ -152,6 +160,13 @@ namespace SingleDoc {
 		// llamamos funcion que asigna promesa que existe en ese archivo
 		// y recarga los documentos en otro hilo
 		Documentos::reload_docs();
+		TimeGraph::reload_data();
+		CategoryGraph::reload_data();
+
+		// Si eliminamos correctamente cerramos la ventana de edicion del documento
+		reset(); // Limpiamos variables, no se mezclan variables si crean doc nuevo
+		AppState::showSingleDoc = false;
+
 		return true;
 	}
 
@@ -184,8 +199,8 @@ namespace SingleDoc {
 		ImGui::SetNextWindowSize(ImVec2(350.0f, 300.0f));
 		ImGui::SetNextWindowPos(
 			ImVec2(
-				ImGui::GetMainViewport()->Pos.x + 50,
-				ImGui::GetMainViewport()->Pos.y + ImGui::GetMainViewport()->Size.y / 2
+				ImGui::GetMainViewport()->Pos.x + 200,
+				ImGui::GetMainViewport()->Pos.y + ImGui::GetMainViewport()->Size.y / 2.5f
 			)
 			, ImGuiCond_Appearing);
 
@@ -240,20 +255,6 @@ namespace SingleDoc {
 			if (ImGui::Button(ICON_MD_DELETE, ImVec2(30.0f, 30.0f))) {
 				// Pasamos en otro Hilo para no pegar el hilo de la renderizacion del la GUI
 				delete_promise = std::async(std::launch::async, delete_document);
-			}
-		}
-		// Listener delete
-		if (delete_promise._Is_ready()) {
-			// Si es true tuvimos exito
-			if (delete_promise.get()) {
-				// Mostramos Mensaje
-				show_msg = true;
-				feedback_msg = "Documento eliminado correctamente " ICON_MD_MOOD;
-				timeout_result = TimerC::fn(3000, []() -> int {
-					// Es funcion Lamnda no hace nada solo retorna cero
-					// cuando se cumple el timeout
-					return 0;
-					});
 			}
 		}
 
