@@ -6,6 +6,7 @@
 #include "../AppState.h"
 #include "../helpers/ApiHelper.h"
 #include "../helpers/IconsMaterialDesign.h"
+#include "../helpers/ApiHelperC.h"
 
 #include <json/json.h>
 
@@ -50,11 +51,13 @@ namespace TimeGraph {
 	static Json::Value table_data;
 
 	void get_data() {
+		ApiHelperC apiHelperC;
 		Json::Value args;
 		args["sessionHash"] = AppState::sessionHash;
 		args["nMonths"] = meses_consulta;
 
-		Json::Value api_result = ApiHelper::fn(AppState::apiPrefix + "/monthly-graph", args, "GET");
+		Json::Value api_result = apiHelperC.fn(AppState::apiPrefix + "/monthly-graph", args, "GET");
+		//Json::Value api_result = ApiHelper::fn(AppState::apiPrefix + "/monthly-graph", args, "GET");
 
 		refreshing_data = true;
 

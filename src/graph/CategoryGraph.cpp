@@ -8,6 +8,7 @@
 #include "../helpers/IconsMaterialDesign.h"
 #include "../helpers/TimerC.h"
 #include "../src/helpers/FormatNumber.h"
+#include "../helpers/ApiHelperC.h"
 
 #include <json/json.h>
 
@@ -48,11 +49,12 @@ namespace CategoryGraph {
 	}
 
 	void get_data() {
-
+		ApiHelperC apiHelperC;
 		Json::Value args;
 		args["sessionHash"] = AppState::sessionHash;
 
-		Json::Value api_result = ApiHelper::fn(AppState::apiPrefix + "/expenses-by-category", args, "GET");
+		//Json::Value api_result = ApiHelper::fn(AppState::apiPrefix + "/expenses-by-category", args, "GET");
+		Json::Value api_result = apiHelperC.fn(AppState::apiPrefix + "/expenses-by-category", args, "GET");
 
 		refreshing_data = true;
 		// Reseteamos variables

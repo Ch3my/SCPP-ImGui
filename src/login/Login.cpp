@@ -10,9 +10,12 @@
 #include <iostream>
 #include "../AppState.h"
 #include "../src/helpers/ApiHelper.h"
+#include "../src/helpers/ApiHelperC.h"
 
 namespace Login {
 	void login_render() {
+		ApiHelperC apiHelperC;
+
 		static char username[64];
 		static char pass[64];
 
@@ -36,7 +39,8 @@ namespace Login {
 			json_args["username"] = username;
 			json_args["password"] = pass;
 			
-			Json::Value api_res = ApiHelper::fn(AppState::apiPrefix + "/login", json_args, "POST");
+			Json::Value api_res = apiHelperC.fn(AppState::apiPrefix + "/login", json_args, "POST");
+			//Json::Value api_res = ApiHelper::fn(AppState::apiPrefix + "/login", json_args, "POST");
 			if (api_res.isMember("success")) {
 				// Guardar en localstorage.json el sessionHash
 				AppState::sessionHash = api_res["sessionHash"].asString();

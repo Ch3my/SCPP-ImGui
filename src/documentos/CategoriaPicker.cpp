@@ -3,6 +3,7 @@
 
 #include "../AppState.h"
 #include "../helpers/ApiHelper.h"
+#include "../helpers/ApiHelperC.h"
 
 #include <iostream>
 #include <string>
@@ -16,14 +17,16 @@ namespace CategoriaPicker {
 	static ImGuiComboFlags flags = 0;
 
 	void load_categorias() {
-		ImGui::CheckboxFlags("ImGuiComboFlags_PopupAlignLeft", &flags, ImGuiComboFlags_PopupAlignLeft);
+		ApiHelperC apiHelperC;
+		Json::Value json_args;
 
+		ImGui::CheckboxFlags("ImGuiComboFlags_PopupAlignLeft", &flags, ImGuiComboFlags_PopupAlignLeft);
 		// Necesitamos crear una que sea vacia al principio
 		categorias_list.insert({ 0, "(Todos)" });
-
-		Json::Value json_args;
 		json_args["sessionHash"] = AppState::sessionHash;
-		Json::Value data = ApiHelper::fn(AppState::apiPrefix + "/categorias", json_args, "GET");
+
+		//Json::Value data = ApiHelper::fn(AppState::apiPrefix + "/categorias", json_args, "GET");
+		Json::Value data = apiHelperC.fn(AppState::apiPrefix + "/categorias", json_args, "GET");
 
 		for (Json::Value::ArrayIndex i = 0; i != data.size(); i++) {
 			categorias_list.insert({

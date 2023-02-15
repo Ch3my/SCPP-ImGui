@@ -49,6 +49,12 @@
     <Filter Include="Archivos de encabezado\graph">
       <UniqueIdentifier>{cdb63f82-ebae-4ece-afdb-71af06b7ee1c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Archivos de encabezado\curlcpp">
+      <UniqueIdentifier>{cab76206-8997-487e-ae4b-9121a7ce494e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Archivos de origen\curlcpp">
+      <UniqueIdentifier>{8eb2c2fa-d7de-4d7a-b053-4f3664be41bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -137,6 +143,21 @@
     </ClCompile>
     <ClCompile Include="src\graph\TimeGraph.cpp">
       <Filter>Archivos de origen\graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\helpers\FileLogger.cpp">
+      <Filter>Archivos de origen\helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\helpers\ApiHelperC.cpp">
+      <Filter>Archivos de origen\helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="include\curlcpp\curl_easy.cpp">
+      <Filter>Archivos de origen\curlcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="include\curlcpp\curl_form.cpp">
+      <Filter>Archivos de origen\curlcpp</Filter>
+    </ClCompile>
+    <ClCompile Include="include\curlcpp\curl_exception.cpp">
+      <Filter>Archivos de origen\curlcpp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -298,6 +319,33 @@
     </ClInclude>
     <ClInclude Include="src\graph\TimeGraph.h">
       <Filter>Archivos de encabezado\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\helpers\ApiHelperC.h">
+      <Filter>Archivos de encabezado\helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curlcpp\curl_easy.h">
+      <Filter>Archivos de encabezado\curlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curlcpp\curl_ios.h">
+      <Filter>Archivos de encabezado\curlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curlcpp\curl_pair.h">
+      <Filter>Archivos de encabezado\curlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curlcpp\curl_config.h">
+      <Filter>Archivos de encabezado\curlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curlcpp\curl_easy_info.h">
+      <Filter>Archivos de encabezado\curlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curlcpp\curl_form.h">
+      <Filter>Archivos de encabezado\curlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curlcpp\curl_interface.h">
+      <Filter>Archivos de encabezado\curlcpp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\curlcpp\curl_exception.h">
+      <Filter>Archivos de encabezado\curlcpp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

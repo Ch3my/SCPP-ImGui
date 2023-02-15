@@ -4,6 +4,8 @@
 
 #include "../AppState.h"
 #include "../helpers/ApiHelper.h"
+#include "../src/helpers/ApiHelperC.h"
+
 #include "../helpers/Utilities.h"
 #include "./TipoDocPicker.h"
 #include "./CategoriaPicker.h"
@@ -75,12 +77,14 @@ namespace SingleDoc {
 
 	// No static porque se llama de otros archivos
 	void load_document(int id_doc) {
+		ApiHelperC apiHelperC;
 		// Nos pasan un id de Documento y cargamos sus datos en la clase
 		Json::Value args;
 		args["id"][0] = id_doc;
 		args["sessionHash"] = AppState::sessionHash;
 
-		Json::Value api_result = ApiHelper::fn(AppState::apiPrefix + "/documentos", args, "GET");
+		Json::Value api_result = apiHelperC.fn(AppState::apiPrefix + "/documentos", args, "GET");
+		//Json::Value api_result = ApiHelper::fn(AppState::apiPrefix + "/documentos", args, "GET");
 
 		// Deberia venir solo 1 resultado
 		if (api_result.isArray()) {
@@ -101,6 +105,7 @@ namespace SingleDoc {
 	static bool save_document(bool is_update) {
 		// Tomamos datos del formulario y convertimos en argument JSON
 		// para hacer POST a la API
+		ApiHelperC apiHelperC;
 		Json::Value args;
 		if (monto_text == "") {
 			// No se puede monto vacio
@@ -133,7 +138,8 @@ namespace SingleDoc {
 			method = "PUT";
 		}
 
-		Json::Value api_result = ApiHelper::fn(AppState::apiPrefix + "/documentos", args, method);
+		Json::Value api_result = apiHelperC.fn(AppState::apiPrefix + "/documentos", args, method);
+		//Json::Value api_result = ApiHelper::fn(AppState::apiPrefix + "/documentos", args, method);
 
 		if (api_result.isMember("hasErrors")) {
 			return false;
@@ -146,11 +152,13 @@ namespace SingleDoc {
 	}
 
 	static bool delete_document() {
+		ApiHelperC apiHelperC;
 		Json::Value args;
 		args["sessionHash"] = AppState::sessionHash;
 		args["id"] = id;
 
-		Json::Value api_result = ApiHelper::fn(AppState::apiPrefix + "/documentos", args, "DELETE");
+		Json::Value api_result = apiHelperC.fn(AppState::apiPrefix + "/documentos", args, "DELETE");
+		//Json::Value api_result = ApiHelper::fn(AppState::apiPrefix + "/documentos", args, "DELETE");
 
 		if (api_result.isMember("hasErrors")) {
 			return false;

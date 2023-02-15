@@ -3,6 +3,7 @@
 
 #include "../AppState.h"
 #include "../helpers/ApiHelper.h"
+#include "../helpers/ApiHelperC.h"
 
 #include <iostream>
 #include <string>
@@ -19,12 +20,14 @@ namespace TipoDocPicker {
 	static std::future<void> promise;
 
 	void load_tipo_doc() {
-		ImGui::CheckboxFlags("ImGuiComboFlags_PopupAlignLeft", &flags, ImGuiComboFlags_PopupAlignLeft);
-
-
+		ApiHelperC apiHelperC;
 		Json::Value json_args;
+
+		ImGui::CheckboxFlags("ImGuiComboFlags_PopupAlignLeft", &flags, ImGuiComboFlags_PopupAlignLeft);
 		json_args["sessionHash"] = AppState::sessionHash;
-		Json::Value data = ApiHelper::fn(AppState::apiPrefix + "/tipo-docs", json_args, "GET");
+
+		//Json::Value data = ApiHelper::fn(AppState::apiPrefix + "/tipo-docs", json_args, "GET");
+		Json::Value data = apiHelperC.fn(AppState::apiPrefix + "/tipo-docs", json_args, "GET");
 
 		for (Json::Value::ArrayIndex i = 0; i != data.size(); i++) {
 			tipo_doc_list.insert({

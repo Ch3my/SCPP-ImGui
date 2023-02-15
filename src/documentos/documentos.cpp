@@ -1,5 +1,6 @@
 #include "../AppState.h"
 #include "../src/helpers/ApiHelper.h"
+#include "../src/helpers/ApiHelperC.h"
 #include "../src/helpers/FormatNumber.h"
 #include "../src/helpers/Utilities.h"
 #include "SingleDoc.h"
@@ -37,7 +38,7 @@ namespace Documentos {
 	static bool show_implot_demo = false;
 
 	static Json::Value docs;
-	static std::atomic<int> sum_docs = 0;
+	static std::string sum_docs;
 
 	static const char* dateFormat = "%d/%m/%Y";
 	static tm fecha_inicio = { 0 };
@@ -60,7 +61,6 @@ namespace Documentos {
 	void reset() {
 		fk_tipo_doc = 1;
 		fk_categoria = 0;
-		sum_docs = 0;
 		Utilities::SetTmFromTipoDoc(fecha_inicio, fecha_termino, fk_tipo_doc);
 		reload_docs();
 	}
@@ -78,7 +78,7 @@ namespace Documentos {
 		if (show_implot_demo) {
 			ImPlot::ShowDemoWindow();
 		}
-		
+
 		// Estas variables se pierden entre renderizaciones pero como son flags nomas
 		// en teoria no hace diferencia, de usarse se usan durante el mismo ciclo que se definieron
 		// asi podemos liberar memoria ?
@@ -272,7 +272,7 @@ namespace Documentos {
 
 		}
 
-		std::string total_text = "Total $ " + FormatNumber::format(sum_docs, NULL, NULL);
+		std::string total_text = "Total $ " + sum_docs;
 		ImGui::SetCursorPosX(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(total_text.c_str()).x - CELL_PADDING_V);
 		ImGui::Text(total_text.c_str());
 
@@ -282,6 +282,7 @@ namespace Documentos {
 	}
 
 	Json::Value get_documentos() {
+		ApiHelperC apiHelperC;
 		Json::Value json_args;
 		json_args["sessionHash"] = AppState::sessionHash;
 		json_args["fk_tipoDoc"] = fk_tipo_doc;
@@ -291,8 +292,11 @@ namespace Documentos {
 		if (fk_categoria != 0) {
 			json_args["fk_categoria"] = fk_categoria;
 		}
+		int local_sum_docs = 0;
 
-		Json::Value data = ApiHelper::fn(AppState::apiPrefix + "/documentos", json_args, "GET");
+		//Json::Value data = ApiHelper::fn(AppState::apiPrefix + "/documentos", json_args, "GET");
+		Json::Value data = apiHelperC.fn(AppState::apiPrefix + "/documentos", json_args, "GET");
+
 		if (data == NULL) {
 			std::cout << "Error de comunicacion con la Firma?" << std::endl;
 			return NULL;
@@ -309,8 +313,10 @@ namespace Documentos {
 		for (Json::Value::ArrayIndex i = 0; i != data.size(); i++) {
 			std::string formattedNumber = FormatNumber::format(data[i]["monto"].asInt(), NULL, NULL);
 			data[i]["montoFormatted"] = formattedNumber;
-			sum_docs += data[i]["monto"].asInt();
+			local_sum_docs += data[i]["monto"].asInt();
 		}
+		sum_docs = FormatNumber::format(local_sum_docs, NULL, NULL);
+
 		return data;
 	}
 
