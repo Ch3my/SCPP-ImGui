@@ -347,6 +347,9 @@
     <ClInclude Include="include\curlcpp\curl_exception.h">
       <Filter>Archivos de encabezado\curlcpp</Filter>
     </ClInclude>
+    <ClInclude Include="src\helpers\FileLogger.h">
+      <Filter>Archivos de encabezado\helpers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">

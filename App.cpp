@@ -363,7 +363,7 @@ static void glfw_error_callback(int error, const char* description)
 
 // === PROD ===
 // int main(int, char**) para Debug y int WinMain(int, char**) prod, para evitar consola
-int main(int, char**)
+int WinMain(int, char**)
 {
     // Setup GLFW window
     glfwSetErrorCallback(glfw_error_callback);

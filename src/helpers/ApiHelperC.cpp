@@ -8,6 +8,9 @@
 #include <curlcpp/curl_easy.h>
 #include <curlcpp/curl_ios.h>
 
+#include "../src/helpers/FileLogger.h"
+#include "../src/helpers/Utilities.h"
+
 class ApiHelperC {
 public:
 	Json::Value fn(std::string url, Json::Value json_args, std::string method);
@@ -75,7 +78,7 @@ std::string ApiHelperC::api_call_custom(std::string url, Json::Value json_args, 
 	}
 	catch (curl::curl_easy_exception& error) {
 		// If you want to print the last error.
-		std::cerr << error.what() << std::endl;
+		FileLogger::log(error.what());
 	}
 
 	return response_string.str();
@@ -102,7 +105,7 @@ std::string ApiHelperC::api_call_get(std::string url, Json::Value json_args) {
 	}
 	catch (curl::curl_easy_exception& error) {
 		// If you want to print the last error.
-		std::cerr << error.what() << std::endl;
+		FileLogger::log(error.what());
 	}
 
 	return response_string.str();
@@ -120,20 +123,14 @@ Json::Value ApiHelperC::fn(std::string url, Json::Value json_args, std::string m
 		json_string = api_call_get(url, json_args);
 	}
 
-	if (json_reader.parse(json_string, json_data))
+	if (!json_reader.parse(json_string, json_data))
 	{
-		// json_data now contains the parsed JSON data
-		/*for (auto it = json_data.begin(); it != json_data.end(); ++it) {
-			if (it->isString()) {
-				std::cout << it.key() << ": " << it->asString() << std::endl;
-			}
-		}*/
+		std::string log = "Error parsing JSON calling: " + method + " " + url;
+		log += Utilities::json_to_string(json_args);
+		log += "API respondio " + json_string;
+		FileLogger::log(log);
+		return NULL;
 	}
-	else
-	{
-		std::cout << "Error parsing JSON calling: " << method << " " << url << std::endl;
-		std::cout << json_args << std::endl;
-		std::cout << "API respondio " << json_string << std::endl;
-	}
+
 	return json_data;
 }

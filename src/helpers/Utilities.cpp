@@ -2,8 +2,12 @@
 #include <string>
 #include <vector>
 #include <chrono>
+#include <mutex>
+#include <json/json.h>
 
 namespace Utilities {
+	static std::mutex lock_json_to_string;
+
 	std::vector<std::string> SplitString(
 		std::string str,
 		std::string delimeter)
@@ -181,5 +185,16 @@ namespace Utilities {
 				static_cast<unsigned>(fin_year.day())
 			);
 		}
+	}
+
+	std::string json_to_string(const Json::Value& json) {
+		// Para que sea Thread Safe. Se crea aqui para no tener
+		// que hacer una instancia de ApiHelper para acceder a esta funcionalidad
+		std::lock_guard<std::mutex> lock_guard(lock_json_to_string);
+
+		Json::StreamWriterBuilder builder;
+		builder["indentation"] = ""; // If you want whitespace-less output
+		const std::string output = Json::writeString(builder, json);
+		return output;
 	}
 }

@@ -55,8 +55,12 @@ namespace CategoryGraph {
 
 		//Json::Value api_result = ApiHelper::fn(AppState::apiPrefix + "/expenses-by-category", args, "GET");
 		Json::Value api_result = apiHelperC.fn(AppState::apiPrefix + "/expenses-by-category", args, "GET");
-
 		refreshing_data = true;
+		if (api_result == NULL) {
+			refreshing_data = false;
+			return;
+		}
+
 		// Reseteamos variables
 		bar_data.clear();
 		bar_labels.clear();

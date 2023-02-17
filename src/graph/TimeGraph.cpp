@@ -57,9 +57,12 @@ namespace TimeGraph {
 		args["nMonths"] = meses_consulta;
 
 		Json::Value api_result = apiHelperC.fn(AppState::apiPrefix + "/monthly-graph", args, "GET");
-		//Json::Value api_result = ApiHelper::fn(AppState::apiPrefix + "/monthly-graph", args, "GET");
-
 		refreshing_data = true;
+		//Json::Value api_result = ApiHelper::fn(AppState::apiPrefix + "/monthly-graph", args, "GET");
+		if (api_result == NULL) {
+			refreshing_data = false;
+			return;
+		}
 
 		// Resetea variables. Evita que crezca la tabla con datos repetidos
 		gastos_line.clear();

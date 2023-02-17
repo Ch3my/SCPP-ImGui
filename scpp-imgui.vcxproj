@@ -237,6 +237,7 @@
     <ClInclude Include="src\graph\TimeGraph.h" />
     <ClInclude Include="src\helpers\ApiHelper.h" />
     <ClInclude Include="src\helpers\ApiHelperC.h" />
+    <ClInclude Include="src\helpers\FileLogger.h" />
     <ClInclude Include="src\helpers\FormatNumber.h" />
     <ClInclude Include="src\helpers\IconsMaterialDesign.h" />
     <ClInclude Include="src\helpers\imguidatechooser.h" />

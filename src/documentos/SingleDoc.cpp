@@ -41,6 +41,7 @@ namespace SingleDoc {
 
 	static bool show_window = true;
 	static bool show_msg = false;
+	static bool working = false;
 	static std::string feedback_msg = "";
 
 	// Solo declaracion, definimos mas abajo
@@ -60,6 +61,7 @@ namespace SingleDoc {
 
 	static bool save_to_cloud() {
 		bool result = false;
+		working = true;
 		if (id != NULL) {
 			result = save_document(true);
 		}
@@ -72,6 +74,7 @@ namespace SingleDoc {
 			CategoryGraph::reload_data();
 		}
 
+		working = false;
 		return result;
 	}
 
@@ -228,11 +231,30 @@ namespace SingleDoc {
 			feedback_msg = "";
 		}
 
+		// ____   _
+		// | _ \ | |
+		// ||_) || |_  _ __   ___
+		// | _ < | __|| '_ \ / __|
+		// | |_)|| |_ | | | |\__ \
+		// |____/ \__||_| |_||___/
 		// Para que nos quede los botones queden centrados
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 1.4f));
 		if (ImGui::Button(ICON_MD_SAVE, ImVec2(30.0f, 30.0f))) {
 			// Pasamos en otro Hilo para no pegar el hilo de la renderizacion del la GUI
 			promise = std::async(std::launch::async, save_to_cloud);
+		}
+		if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_S)) && 
+			ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_LeftCtrl)) &&
+			!working) {
+			// Puede guardar usando ctrl+s
+			promise = std::async(std::launch::async, save_to_cloud);
+		}
+		if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_X)) &&
+			ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_LeftCtrl)) &&
+			show_window) {
+			// cerrar esta ventana con Ctrl+X
+			reset(); // Limpiamos variables, no se mezclan variables si crean doc nuevo
+			AppState::showSingleDoc = false;
 		}
 
 		// Listener save_to_cloud
@@ -278,6 +300,9 @@ namespace SingleDoc {
 		// la linea con los otros inputs del formulario
 		ImGui::SameLine(80);
 
+		if (ImGui::IsWindowAppearing()) {
+			ImGui::SetKeyboardFocusHere();
+		}
 		// Tratamos a monto como std::string porque tenemos que formatearlo con separador de miles
 		// no acepta decimales ni otra cosa. ImGui parece que no tiene una manera de hacer esto
 		// mejor
@@ -287,7 +312,9 @@ namespace SingleDoc {
 			// Si esta vacio no hacemos nada. Da error el ejecutar stoi en string vacio
 			if (!monto_text.empty()) {
 				monto_text = Utilities::get_digits(monto_text, false);
-				monto_text = FormatNumber::format(std::stoi(monto_text), NULL, NULL);
+				if (!monto_text.empty()) {
+					monto_text = FormatNumber::format(std::stoi(monto_text), NULL, NULL);
+				}
 			}
 		}
 

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <json/json.h>
 
 namespace Utilities {
 	std::vector<std::string> SplitString(std::string str, std::string delimeter);
@@ -13,4 +14,5 @@ namespace Utilities {
 	std::vector<std::string> GetCurrentYearRange();
 	std::string FormatTm(const char* date_format, tm date);
 	void SetTmFromTipoDoc(tm& fecha_inicio, tm& fecha_termino, const int& fk_tipo_doc);
+	std::string json_to_string(const Json::Value& json);
 }

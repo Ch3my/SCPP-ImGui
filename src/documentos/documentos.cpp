@@ -3,6 +3,7 @@
 #include "../src/helpers/ApiHelperC.h"
 #include "../src/helpers/FormatNumber.h"
 #include "../src/helpers/Utilities.h"
+#include "../src/helpers/FileLogger.h"
 #include "SingleDoc.h"
 #include "../helpers/IconsMaterialDesign.h"
 #include "TipoDocPicker.h"
@@ -77,7 +78,7 @@ namespace Documentos {
 		}
 		if (show_implot_demo) {
 			ImPlot::ShowDemoWindow();
-		}
+		}		
 
 		// Estas variables se pierden entre renderizaciones pero como son flags nomas
 		// en teoria no hace diferencia, de usarse se usan durante el mismo ciclo que se definieron
@@ -139,17 +140,22 @@ namespace Documentos {
 		// | |_)|| |_ | | | |\__ \
 		// |____/ \__||_| |_||___/
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.0f, 1.4f));
+		if (ImGui::Button(ICON_MD_ADD_CIRCLE, ImVec2(30.0f, 30.0f))) {
+			SingleDoc::reset(); // Resetamos antes por si acaso
+			AppState::showSingleDoc = true;
+		}
+		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_A)) && !AppState::showSingleDoc) {
+			SingleDoc::reset(); // Resetamos antes por si acaso
+			AppState::showSingleDoc = true;
+		}
+
+		ImGui::SameLine();
 		if (ImGui::Button(ICON_MD_REFRESH, ImVec2(30.0f, 30.0f))) {
 			reload_docs();
 		}
 		ImGui::SameLine();
 		if (ImGui::Button(ICON_MD_CLEAR_ALL, ImVec2(30.0f, 30.0f))) {
 			reset();
-		}
-		ImGui::SameLine();
-		if (ImGui::Button(ICON_MD_ADD_CIRCLE, ImVec2(30.0f, 30.0f))) {
-			SingleDoc::reset(); // Resetamos antes por si acaso
-			AppState::showSingleDoc = true;
 		}
 		ImGui::PopStyleVar();
 
@@ -298,13 +304,14 @@ namespace Documentos {
 		Json::Value data = apiHelperC.fn(AppState::apiPrefix + "/documentos", json_args, "GET");
 
 		if (data == NULL) {
-			std::cout << "Error de comunicacion con la Firma?" << std::endl;
+			FileLogger::log("Documentos.get_documentos() data == NULL. Error de comunicacion con la API?");
 			return NULL;
 		}
 		// isMember crash si tratamos de llamarlo sobre un array
 		// por eso verificamos que sea objeto primero
 		if (data.isObject() && data.isMember("hasErrors")) {
 			// Si hay errores no podemos iterar, debemos mostrar mensaje y salir
+			FileLogger::log("Documentos.get_documentos() API responde hasErrors " + Utilities::json_to_string(data));
 			return NULL;
 		}
 
