@@ -213,7 +213,8 @@ namespace Documentos {
 		}
 
 		// Si la promesa esta ok usamos su resultado
-		if (promise._Is_ready()) {
+		// _is_ready aun no esta ok. C++ esta "trabajando" en ello desde 2014 pero aun no esta listo para uso al parecer
+		if (promise.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
 			// al llamar .get ya promesa deja de _Is_ready() asi no se 
 			// ejecuta mas de una vez este codigo
 			docs = promise.get();
