@@ -224,7 +224,7 @@ namespace SingleDoc {
 			ImGui::Separator();
 			ImGui::Spacing();
 		}
-		if (timeout_result._Is_ready()) {
+		if (timeout_result.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
 			// Llamamos a Get para que se muera el hilo (deja de estar is_ready y C++ se encarga de matarlo?)
 			timeout_result.get();
 			show_msg = false;
@@ -258,7 +258,7 @@ namespace SingleDoc {
 		}
 
 		// Listener save_to_cloud
-		if (promise._Is_ready()) {
+		if (promise.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
 			// Si es true tuvimos exito
 			if (promise.get()) {
 				// Mostramos Mensaje
