@@ -418,9 +418,9 @@ endif()
 ################################################################################
 if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     set(ADDITIONAL_LIBRARY_DEPENDENCIES
-        "$(SolutionDir)\lib\libcurl;"
-        "$(SolutionDir)\lib\glfw\glfw3;"
-        "$(SolutionDir)lib\vulkan\vulkan-1"
+        "$(SolutionDir)/lib/libcurl;"
+        "$(SolutionDir)/lib/glfw/glfw3;"
+        "$(SolutionDir)lib/vulkan/vulkan-1"
     )
 endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE "${ADDITIONAL_LIBRARY_DEPENDENCIES}")
