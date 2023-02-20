@@ -12,7 +12,7 @@
 #include "../helpers/FormatNumber.h"
 #include "../helpers/IconsMaterialDesign.h"
 #include "../helpers/TimerC.h"
-#include "documentos.h"
+#include "Documentos.h"
 #include "../graph/CategoryGraph.h"
 #include "../graph/TimeGraph.h"
 
