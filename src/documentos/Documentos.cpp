@@ -10,6 +10,7 @@
 #include "CategoriaPicker.h"
 
 #include <imgui/imgui.h>
+#include <imgui/imgui_stdlib.h>
 #include <imgui/imgui_impl_win32.h>
 #include <imgui/imgui_impl_dx12.h>
 #include "../helpers/imguidatechooser.h"
@@ -27,8 +28,7 @@
 namespace Documentos {
 	// static para que no de error de linking por una variable del mismo nombre en otro archivo
 	// Aunque los namespaces nos ayudan a evitar eso tambien
-	static int fk_tipo_doc = 1; // 1 = Gasto, carga por defecto
-	static int fk_categoria = 0; // 0 = Todos
+	static const char* dateFormat = "%d/%m/%Y";
 	static std::future<Json::Value> promise;
 	static std::future<void> promise_single_doc;
 	static bool mounted = false;
@@ -41,9 +41,11 @@ namespace Documentos {
 	static Json::Value docs;
 	static std::string sum_docs;
 
-	static const char* dateFormat = "%d/%m/%Y";
+	static int fk_tipo_doc = 1; // 1 = Gasto, carga por defecto
+	static int fk_categoria = 0; // 0 = Todos
 	static tm fecha_inicio = { 0 };
 	static tm fecha_termino = { 0 };
+	static std::string searchPhrase = "";
 
 	// Tenemos que declarar (dentro del namespace) para llamar antes de definir, o dar vuelta las funciones
 	Json::Value get_documentos();
@@ -62,6 +64,7 @@ namespace Documentos {
 	void reset() {
 		fk_tipo_doc = 1;
 		fk_categoria = 0;
+		searchPhrase = "";
 		Utilities::SetTmFromTipoDoc(fecha_inicio, fecha_termino, fk_tipo_doc);
 		reload_docs();
 	}
@@ -78,7 +81,7 @@ namespace Documentos {
 		}
 		if (show_implot_demo) {
 			ImPlot::ShowDemoWindow();
-		}		
+		}
 
 		// Estas variables se pierden entre renderizaciones pero como son flags nomas
 		// en teoria no hace diferencia, de usarse se usan durante el mismo ciclo que se definieron
@@ -144,7 +147,9 @@ namespace Documentos {
 			SingleDoc::reset(); // Resetamos antes por si acaso
 			AppState::showSingleDoc = true;
 		}
-		if (ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_A)) && !AppState::showSingleDoc) {
+		if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_LeftCtrl))
+			&& ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_A))
+			&& !AppState::showSingleDoc) {
 			SingleDoc::reset(); // Resetamos antes por si acaso
 			AppState::showSingleDoc = true;
 		}
@@ -190,6 +195,15 @@ namespace Documentos {
 			reload_docs();
 		}
 
+		ImGui::Text("Buscar");
+		ImGui::SameLine(120);
+		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+		ImGui::InputText("##searchPhraseinput", &searchPhrase);
+		if (ImGui::IsItemDeactivated()) {
+			// Triggered on "enter" or click outside
+			reload_docs();
+		}
+
 		ImGui::Spacing();
 		if (tipo_doc_combo_changed) {
 			// Si cambian el tipo de documento nos aseguramos de cambiar el rango de fecha
@@ -214,7 +228,8 @@ namespace Documentos {
 
 		// Si la promesa esta ok usamos su resultado
 		// _is_ready aun no esta ok. C++ esta "trabajando" en ello desde 2014 pero aun no esta listo para uso al parecer
-		if (promise.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
+		// sin .valid() se caia. Seria mas facil usar _is_ready nomas jajaj
+		if (promise.valid() && promise.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
 			// al llamar .get ya promesa deja de _Is_ready() asi no se 
 			// ejecuta mas de una vez este codigo
 			docs = promise.get();
@@ -295,6 +310,7 @@ namespace Documentos {
 		json_args["fk_tipoDoc"] = fk_tipo_doc;
 		json_args["fechaInicio"] = Utilities::FormatTm("%Y-%m-%d", fecha_inicio);
 		json_args["fechaTermino"] = Utilities::FormatTm("%Y-%m-%d", fecha_termino);
+		json_args["searchPhrase"] = searchPhrase;
 		// 0 Significa todos. Ignoramos completamente si es cero
 		if (fk_categoria != 0) {
 			json_args["fk_categoria"] = fk_categoria;
