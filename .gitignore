@@ -16,7 +16,6 @@ localstorage.json
 # Compiled Dynamic libraries
 *.so
 *.dylib
-*.dll
 
 # Fortran module files
 *.mod
@@ -29,7 +28,6 @@ localstorage.json
 *.lib
 
 # Executables
-*.exe
 *.out
 *.app
 .vs
