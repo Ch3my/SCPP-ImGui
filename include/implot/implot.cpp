@@ -122,6 +122,9 @@ You can read releases logs https://github.com/epezent/implot/releases for more d
 
 */
 
+// Para ImGui 1.89.5
+#define IMGUI_DEFINE_MATH_OPERATORS
+
 #include "implot.h"
 #include "implot_internal.h"
 
